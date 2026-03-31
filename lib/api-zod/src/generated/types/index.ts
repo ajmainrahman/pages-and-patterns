@@ -8,9 +8,11 @@
 
 export * from "./authorCount";
 export * from "./book";
+export * from "./bookFormat";
 export * from "./bookLanguage";
 export * from "./bookStatus";
 export * from "./createBookBody";
+export * from "./createBookBodyFormat";
 export * from "./createBookBodyLanguage";
 export * from "./createBookBodyStatus";
 export * from "./errorResponse";
@@ -22,5 +24,6 @@ export * from "./listBooksParams";
 export * from "./listBooksStatus";
 export * from "./listRecentBooksParams";
 export * from "./updateBookBody";
+export * from "./updateBookBodyFormat";
 export * from "./updateBookBodyLanguage";
 export * from "./updateBookBodyStatus";

@@ -5,6 +5,7 @@
  * Personal Library Portfolio API
  * OpenAPI spec version: 0.1.0
  */
+import type { BookFormat } from "./bookFormat";
 import type { BookLanguage } from "./bookLanguage";
 import type { BookStatus } from "./bookStatus";
 
@@ -42,6 +43,15 @@ export interface Book {
    * @nullable
    */
   readingDeadline?: string | null;
+  /**
+   * How the book was read (pdf or physical copy)
+   * @nullable
+   */
+  format?: BookFormat;
+  /** Whether the physical book is at home */
+  isOwned: boolean;
+  /** Whether the user wants to purchase this book */
+  wantToBuy: boolean;
   isFavorite: boolean;
   createdAt: Date;
   updatedAt: Date;

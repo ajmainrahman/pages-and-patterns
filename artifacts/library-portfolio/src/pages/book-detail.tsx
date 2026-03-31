@@ -14,7 +14,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil } from "lucide-react";
+import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil, Home, ShoppingCart, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -307,6 +307,11 @@ export default function BookDetail() {
           </Link>
         </Button>
         <div className="flex gap-2">
+          <Button variant="outline" asChild className="border-border hover:bg-secondary">
+            <Link href={`/books/${id}/edit`} className="flex items-center gap-2">
+              <Pencil className="w-4 h-4" /> Edit
+            </Link>
+          </Button>
           <Button 
             variant="outline" 
             className="text-destructive hover:bg-destructive/10 hover:text-destructive border-transparent"
@@ -338,17 +343,35 @@ export default function BookDetail() {
           
           <div className="bg-card border rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 shrink-0" />
               <span>Published {book.publishedYear || "Unknown"}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-4 h-4 shrink-0" />
               <span>{book.pageCount ? `${book.pageCount} pages` : "Unknown pages"}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
+              <Clock className="w-4 h-4 shrink-0" />
               <span>Added {format(new Date(book.createdAt), 'MMM d, yyyy')}</span>
             </div>
+            {book.format && (
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <FileText className="w-4 h-4 shrink-0" />
+                <span>{book.format === "physical" ? "📚 Physical Copy" : "📄 PDF / Digital"}</span>
+              </div>
+            )}
+            {book.isOwned && (
+              <div className="flex items-center gap-3 text-sm text-emerald-600 font-medium">
+                <Home className="w-4 h-4 shrink-0" />
+                <span>In my home</span>
+              </div>
+            )}
+            {book.wantToBuy && (
+              <div className="flex items-center gap-3 text-sm text-amber-600 font-medium">
+                <ShoppingCart className="w-4 h-4 shrink-0" />
+                <span>Want to buy</span>
+              </div>
+            )}
           </div>
 
           {showProgress && (

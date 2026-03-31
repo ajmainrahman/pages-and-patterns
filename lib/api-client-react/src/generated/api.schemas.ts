@@ -31,6 +31,17 @@ export const BookLanguage = {
   bengali: "bengali",
 } as const;
 
+/**
+ * How the book was read (pdf or physical copy)
+ * @nullable
+ */
+export type BookFormat = (typeof BookFormat)[keyof typeof BookFormat] | null;
+
+export const BookFormat = {
+  pdf: "pdf",
+  physical: "physical",
+} as const;
+
 export interface Book {
   id: number;
   title: string;
@@ -65,6 +76,15 @@ export interface Book {
    * @nullable
    */
   readingDeadline?: string | null;
+  /**
+   * How the book was read (pdf or physical copy)
+   * @nullable
+   */
+  format?: BookFormat;
+  /** Whether the physical book is at home */
+  isOwned: boolean;
+  /** Whether the user wants to purchase this book */
+  wantToBuy: boolean;
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string;
@@ -85,6 +105,18 @@ export type CreateBookBodyLanguage =
 export const CreateBookBodyLanguage = {
   english: "english",
   bengali: "bengali",
+} as const;
+
+/**
+ * @nullable
+ */
+export type CreateBookBodyFormat =
+  | (typeof CreateBookBodyFormat)[keyof typeof CreateBookBodyFormat]
+  | null;
+
+export const CreateBookBodyFormat = {
+  pdf: "pdf",
+  physical: "physical",
 } as const;
 
 export interface CreateBookBody {
@@ -110,6 +142,10 @@ export interface CreateBookBody {
   currentPage?: number | null;
   /** @nullable */
   readingDeadline?: string | null;
+  /** @nullable */
+  format?: CreateBookBodyFormat;
+  isOwned?: boolean;
+  wantToBuy?: boolean;
   isFavorite?: boolean;
 }
 
@@ -128,6 +164,18 @@ export type UpdateBookBodyLanguage =
 export const UpdateBookBodyLanguage = {
   english: "english",
   bengali: "bengali",
+} as const;
+
+/**
+ * @nullable
+ */
+export type UpdateBookBodyFormat =
+  | (typeof UpdateBookBodyFormat)[keyof typeof UpdateBookBodyFormat]
+  | null;
+
+export const UpdateBookBodyFormat = {
+  pdf: "pdf",
+  physical: "physical",
 } as const;
 
 export interface UpdateBookBody {
@@ -153,6 +201,10 @@ export interface UpdateBookBody {
   currentPage?: number | null;
   /** @nullable */
   readingDeadline?: string | null;
+  /** @nullable */
+  format?: UpdateBookBodyFormat;
+  isOwned?: boolean;
+  wantToBuy?: boolean;
   isFavorite?: boolean;
 }
 

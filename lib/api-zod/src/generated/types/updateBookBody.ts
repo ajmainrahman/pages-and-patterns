@@ -5,6 +5,7 @@
  * Personal Library Portfolio API
  * OpenAPI spec version: 0.1.0
  */
+import type { UpdateBookBodyFormat } from "./updateBookBodyFormat";
 import type { UpdateBookBodyLanguage } from "./updateBookBodyLanguage";
 import type { UpdateBookBodyStatus } from "./updateBookBodyStatus";
 
@@ -31,5 +32,9 @@ export interface UpdateBookBody {
   currentPage?: number | null;
   /** @nullable */
   readingDeadline?: string | null;
+  /** @nullable */
+  format?: UpdateBookBodyFormat;
+  isOwned?: boolean;
+  wantToBuy?: boolean;
   isFavorite?: boolean;
 }

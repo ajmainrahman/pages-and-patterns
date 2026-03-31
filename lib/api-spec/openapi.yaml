@@ -302,6 +302,16 @@ components:
         readingDeadline:
           type: ["string", "null"]
           description: Target date to finish the book (YYYY-MM-DD)
+        format:
+          type: ["string", "null"]
+          enum: [pdf, physical, null]
+          description: How the book was read (pdf or physical copy)
+        isOwned:
+          type: boolean
+          description: Whether the physical book is at home
+        wantToBuy:
+          type: boolean
+          description: Whether the user wants to purchase this book
         isFavorite:
           type: boolean
         createdAt:
@@ -318,6 +328,8 @@ components:
         - quotes
         - status
         - language
+        - isOwned
+        - wantToBuy
         - isFavorite
         - createdAt
         - updatedAt
@@ -361,6 +373,15 @@ components:
           type: ["integer", "null"]
         readingDeadline:
           type: ["string", "null"]
+        format:
+          type: ["string", "null"]
+          enum: [pdf, physical, null]
+        isOwned:
+          type: boolean
+          default: false
+        wantToBuy:
+          type: boolean
+          default: false
         isFavorite:
           type: boolean
           default: false
@@ -405,6 +426,13 @@ components:
           type: ["integer", "null"]
         readingDeadline:
           type: ["string", "null"]
+        format:
+          type: ["string", "null"]
+          enum: [pdf, physical, null]
+        isOwned:
+          type: boolean
+        wantToBuy:
+          type: boolean
         isFavorite:
           type: boolean
 

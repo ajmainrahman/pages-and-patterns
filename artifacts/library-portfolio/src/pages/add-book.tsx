@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { BookOpen, Sparkles, Target } from "lucide-react";
+import { BookOpen, Sparkles, Target, Home, ShoppingCart, FileText } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -23,6 +23,9 @@ const formSchema = z.object({
   rating: z.coerce.number().min(0).max(5).optional(),
   status: z.enum(["read", "reading", "want_to_read"]),
   language: z.enum(["english", "bengali"]).default("english"),
+  format: z.enum(["pdf", "physical"]).optional().or(z.literal("")),
+  isOwned: z.boolean().default(false),
+  wantToBuy: z.boolean().default(false),
   coverUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   publishedYear: z.coerce.number().optional().or(z.literal(0)),
   pageCount: z.coerce.number().optional().or(z.literal(0)),
@@ -49,6 +52,9 @@ export default function AddBook() {
       rating: 0,
       status: "want_to_read",
       language: "english",
+      format: "",
+      isOwned: false,
+      wantToBuy: false,
       coverUrl: "",
       publishedYear: 0,
       pageCount: 0,
@@ -66,6 +72,9 @@ export default function AddBook() {
       genres: values.genres ? values.genres.split(",").map(g => g.trim()).filter(Boolean) : [],
       status: values.status,
       language: values.language,
+      format: (values.format && values.format !== "none" ? values.format as "pdf" | "physical" : null),
+      isOwned: values.isOwned,
+      wantToBuy: values.wantToBuy,
       summary: values.summary || null,
       review: values.review || null,
       rating: values.rating ? values.rating : null,
@@ -188,6 +197,63 @@ export default function AddBook() {
                   <FormMessage />
                 </FormItem>
               )} />
+            </div>
+
+            {/* Book Details */}
+            <div className="space-y-6 pt-6">
+              <h2 className="text-xl font-serif border-b pb-2 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" /> Book Details
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="format" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Format</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="How did you read it?" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Not specified</SelectItem>
+                        <SelectItem value="physical">📚 Physical / Hardcopy</SelectItem>
+                        <SelectItem value="pdf">📄 PDF / Digital</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="isOwned" render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border p-4 bg-background">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-0.5" />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="font-medium cursor-pointer flex items-center gap-2">
+                        <Home className="w-4 h-4 text-muted-foreground" /> In my home
+                      </FormLabel>
+                      <p className="text-sm text-muted-foreground">I have a physical copy at home</p>
+                    </div>
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="wantToBuy" render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border p-4 bg-background">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-0.5" />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="font-medium cursor-pointer flex items-center gap-2">
+                        <ShoppingCart className="w-4 h-4 text-muted-foreground" /> Want to buy
+                      </FormLabel>
+                      <p className="text-sm text-muted-foreground">I'd like to purchase this book</p>
+                    </div>
+                  </FormItem>
+                )} />
+              </div>
             </div>
 
             {/* Personal Details */}

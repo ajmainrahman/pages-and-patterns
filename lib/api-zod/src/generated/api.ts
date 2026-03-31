@@ -37,6 +37,14 @@ export const ListBengaliBooksResponseItem = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -78,6 +86,14 @@ export const ListBooksResponseItem = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -89,6 +105,8 @@ export const ListBooksResponse = zod.array(ListBooksResponseItem);
  */
 export const createBookBodyStatusDefault = `want_to_read`;
 export const createBookBodyLanguageDefault = `english`;
+export const createBookBodyIsOwnedDefault = false;
+export const createBookBodyWantToBuyDefault = false;
 export const createBookBodyIsFavoriteDefault = false;
 
 export const CreateBookBody = zod.object({
@@ -110,6 +128,11 @@ export const CreateBookBody = zod.object({
   pageCount: zod.number().nullish(),
   currentPage: zod.number().nullish(),
   readingDeadline: zod.string().nullish(),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish(),
+  isOwned: zod.boolean().default(createBookBodyIsOwnedDefault),
+  wantToBuy: zod.boolean().default(createBookBodyWantToBuyDefault),
   isFavorite: zod.boolean().default(createBookBodyIsFavoriteDefault),
 });
 
@@ -139,6 +162,14 @@ export const GetBookResponse = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -166,6 +197,11 @@ export const UpdateBookBody = zod.object({
   pageCount: zod.number().nullish(),
   currentPage: zod.number().nullish(),
   readingDeadline: zod.string().nullish(),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish(),
+  isOwned: zod.boolean().optional(),
+  wantToBuy: zod.boolean().optional(),
   isFavorite: zod.boolean().optional(),
 });
 
@@ -188,6 +224,14 @@ export const UpdateBookResponse = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -256,6 +300,14 @@ export const ListRecentBooksResponseItem = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -284,6 +336,14 @@ export const ListFavoriteBooksResponseItem = zod.object({
     .string()
     .nullish()
     .describe("Target date to finish the book (YYYY-MM-DD)"),
+  format: zod
+    .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
+    .nullish()
+    .describe("How the book was read (pdf or physical copy)"),
+  isOwned: zod.boolean().describe("Whether the physical book is at home"),
+  wantToBuy: zod
+    .boolean()
+    .describe("Whether the user wants to purchase this book"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),

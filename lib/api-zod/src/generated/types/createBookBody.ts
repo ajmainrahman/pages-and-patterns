@@ -5,6 +5,7 @@
  * Personal Library Portfolio API
  * OpenAPI spec version: 0.1.0
  */
+import type { CreateBookBodyFormat } from "./createBookBodyFormat";
 import type { CreateBookBodyLanguage } from "./createBookBodyLanguage";
 import type { CreateBookBodyStatus } from "./createBookBodyStatus";
 
@@ -31,5 +32,9 @@ export interface CreateBookBody {
   currentPage?: number | null;
   /** @nullable */
   readingDeadline?: string | null;
+  /** @nullable */
+  format?: CreateBookBodyFormat;
+  isOwned?: boolean;
+  wantToBuy?: boolean;
   isFavorite?: boolean;
 }

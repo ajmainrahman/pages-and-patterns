@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Library from "@/pages/library";
 import BookDetail from "@/pages/book-detail";
 import AddBook from "@/pages/add-book";
+import EditBook from "@/pages/edit-book";
 import Stats from "@/pages/stats";
 import BanglaBooks from "@/pages/bangla-books";
 import { Layout } from "@/components/layout";
@@ -19,6 +20,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/library" component={Library} />
+        <Route path="/books/:id/edit" component={EditBook} />
         <Route path="/books/:id" component={BookDetail} />
         <Route path="/add" component={AddBook} />
         <Route path="/stats" component={Stats} />
