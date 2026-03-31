@@ -12,6 +12,7 @@ export const booksTable = pgTable("books", {
   review: text("review"),
   rating: integer("rating"),
   status: text("status", { enum: ["read", "reading", "want_to_read"] }).notNull().default("want_to_read"),
+  language: text("language", { enum: ["english", "bengali"] }).notNull().default("english"),
   coverUrl: text("cover_url"),
   publishedYear: integer("published_year"),
   pageCount: integer("page_count"),

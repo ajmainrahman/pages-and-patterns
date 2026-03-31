@@ -5,7 +5,7 @@ import { StatusBadge } from "./status-badge";
 import { StarRating } from "./star-rating";
 import { Book } from "@workspace/api-client-react/src/generated/api.schemas";
 
-export function BookCard({ book, index = 0 }: { book: Book, index?: number }) {
+export function BookCard({ book, index = 0, bengali = false }: { book: Book, index?: number, bengali?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -46,8 +46,8 @@ export function BookCard({ book, index = 0 }: { book: Book, index?: number }) {
                 <StatusBadge status={book.status} className="text-[10px] px-1.5 py-0" />
                 <StarRating rating={book.rating} />
               </div>
-              <h3 className="font-serif font-bold text-lg leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors">{book.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-1">{book.author}</p>
+              <h3 className={`font-bold text-lg leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors ${bengali || book.language === 'bengali' ? 'font-bengali' : 'font-serif'}`}>{book.title}</h3>
+              <p className={`text-sm text-muted-foreground mb-4 line-clamp-1 ${bengali || book.language === 'bengali' ? 'font-bengali' : ''}`}>{book.author}</p>
               
               <div className="mt-auto flex flex-wrap gap-1.5">
                 {book.genres?.slice(0, 2).map(g => (

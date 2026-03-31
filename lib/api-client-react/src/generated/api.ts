@@ -113,6 +113,81 @@ export function useHealthCheck<
 }
 
 /**
+ * @summary List all Bengali language books
+ */
+export const getListBengaliBooksUrl = () => {
+  return `/api/books/bengali`;
+};
+
+export const listBengaliBooks = async (
+  options?: RequestInit,
+): Promise<Book[]> => {
+  return customFetch<Book[]>(getListBengaliBooksUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListBengaliBooksQueryKey = () => {
+  return [`/api/books/bengali`] as const;
+};
+
+export const getListBengaliBooksQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBengaliBooks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listBengaliBooks>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListBengaliBooksQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listBengaliBooks>>
+  > = ({ signal }) => listBengaliBooks({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBengaliBooks>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListBengaliBooksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBengaliBooks>>
+>;
+export type ListBengaliBooksQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all Bengali language books
+ */
+
+export function useListBengaliBooks<
+  TData = Awaited<ReturnType<typeof listBengaliBooks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listBengaliBooks>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListBengaliBooksQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
  * @summary List all books
  */
 export const getListBooksUrl = (params?: ListBooksParams) => {

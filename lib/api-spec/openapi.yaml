@@ -28,6 +28,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
+  /books/bengali:
+    get:
+      operationId: listBengaliBooks
+      tags: [books]
+      summary: List all Bengali language books
+      responses:
+        "200":
+          description: Bengali books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+
   /books:
     get:
       operationId: listBooks
@@ -50,6 +65,12 @@ paths:
             type: string
             enum: [read, reading, want_to_read]
           description: Filter by reading status
+        - in: query
+          name: language
+          schema:
+            type: string
+            enum: [english, bengali]
+          description: Filter by language
       responses:
         "200":
           description: List of books
@@ -265,6 +286,10 @@ components:
         status:
           type: string
           enum: [read, reading, want_to_read]
+        language:
+          type: string
+          enum: [english, bengali]
+          description: Language of the book
         coverUrl:
           type: ["string", "null"]
         publishedYear:
@@ -286,6 +311,7 @@ components:
         - genres
         - quotes
         - status
+        - language
         - isFavorite
         - createdAt
         - updatedAt
@@ -315,6 +341,10 @@ components:
           type: string
           enum: [read, reading, want_to_read]
           default: want_to_read
+        language:
+          type: string
+          enum: [english, bengali]
+          default: english
         coverUrl:
           type: ["string", "null"]
         publishedYear:
@@ -352,6 +382,9 @@ components:
         status:
           type: string
           enum: [read, reading, want_to_read]
+        language:
+          type: string
+          enum: [english, bengali]
         coverUrl:
           type: ["string", "null"]
         publishedYear:

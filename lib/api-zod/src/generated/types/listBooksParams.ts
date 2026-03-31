@@ -5,6 +5,7 @@
  * Personal Library Portfolio API
  * OpenAPI spec version: 0.1.0
  */
+import type { ListBooksLanguage } from "./listBooksLanguage";
 import type { ListBooksStatus } from "./listBooksStatus";
 
 export type ListBooksParams = {
@@ -20,4 +21,8 @@ export type ListBooksParams = {
    * Filter by reading status
    */
   status?: ListBooksStatus;
+  /**
+   * Filter by language
+   */
+  language?: ListBooksLanguage;
 };

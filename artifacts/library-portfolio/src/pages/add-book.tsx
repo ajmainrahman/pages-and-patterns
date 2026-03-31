@@ -22,6 +22,7 @@ const formSchema = z.object({
   review: z.string().optional(),
   rating: z.coerce.number().min(0).max(5).optional(),
   status: z.enum(["read", "reading", "want_to_read"]),
+  language: z.enum(["english", "bengali"]).default("english"),
   coverUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   publishedYear: z.coerce.number().optional().or(z.literal(0)),
   pageCount: z.coerce.number().optional().or(z.literal(0)),
@@ -45,6 +46,7 @@ export default function AddBook() {
       review: "",
       rating: 0,
       status: "want_to_read",
+      language: "english",
       coverUrl: "",
       publishedYear: 0,
       pageCount: 0,
@@ -59,6 +61,7 @@ export default function AddBook() {
       author: values.author,
       genres: values.genres ? values.genres.split(",").map(g => g.trim()).filter(Boolean) : [],
       status: values.status,
+      language: values.language,
       summary: values.summary || null,
       review: values.review || null,
       rating: values.rating ? values.rating : null,
@@ -126,7 +129,7 @@ export default function AddBook() {
                 )} />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField control={form.control} name="status" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Reading Status *</FormLabel>
@@ -145,10 +148,27 @@ export default function AddBook() {
                     <FormMessage />
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="language" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Language</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="english">English</SelectItem>
+                        <SelectItem value="bengali" className="font-bengali">বাংলা (Bengali)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <FormField control={form.control} name="genres" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Genres (comma separated)</FormLabel>
-                    <FormControl><Input placeholder="e.g. Fiction, Mystery, Dark Academia" className="bg-background" {...field} /></FormControl>
+                    <FormControl><Input placeholder="e.g. Fiction, Mystery" className="bg-background" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

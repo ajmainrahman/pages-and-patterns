@@ -16,9 +16,20 @@ import {
   ListBooksResponse,
   ListRecentBooksResponse,
   ListFavoriteBooksResponse,
+  ListBengaliBooksResponse,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+
+router.get("/books/bengali", async (_req, res): Promise<void> => {
+  const books = await db
+    .select()
+    .from(booksTable)
+    .where(eq(booksTable.language, "bengali"))
+    .orderBy(desc(booksTable.createdAt));
+
+  res.json(ListBengaliBooksResponse.parse(books));
+});
 
 router.get("/books/genres", async (_req, res): Promise<void> => {
   const rows = await db

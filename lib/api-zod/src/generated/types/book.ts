@@ -5,6 +5,7 @@
  * Personal Library Portfolio API
  * OpenAPI spec version: 0.1.0
  */
+import type { BookLanguage } from "./bookLanguage";
 import type { BookStatus } from "./bookStatus";
 
 export interface Book {
@@ -23,6 +24,8 @@ export interface Book {
    */
   rating?: number | null;
   status: BookStatus;
+  /** Language of the book */
+  language: BookLanguage;
   /** @nullable */
   coverUrl?: string | null;
   /** @nullable */

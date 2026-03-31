@@ -21,6 +21,16 @@ export const BookStatus = {
   want_to_read: "want_to_read",
 } as const;
 
+/**
+ * Language of the book
+ */
+export type BookLanguage = (typeof BookLanguage)[keyof typeof BookLanguage];
+
+export const BookLanguage = {
+  english: "english",
+  bengali: "bengali",
+} as const;
+
 export interface Book {
   id: number;
   title: string;
@@ -37,6 +47,8 @@ export interface Book {
    */
   rating?: number | null;
   status: BookStatus;
+  /** Language of the book */
+  language: BookLanguage;
   /** @nullable */
   coverUrl?: string | null;
   /** @nullable */
@@ -57,6 +69,14 @@ export const CreateBookBodyStatus = {
   want_to_read: "want_to_read",
 } as const;
 
+export type CreateBookBodyLanguage =
+  (typeof CreateBookBodyLanguage)[keyof typeof CreateBookBodyLanguage];
+
+export const CreateBookBodyLanguage = {
+  english: "english",
+  bengali: "bengali",
+} as const;
+
 export interface CreateBookBody {
   title: string;
   author: string;
@@ -69,6 +89,7 @@ export interface CreateBookBody {
   /** @nullable */
   rating?: number | null;
   status?: CreateBookBodyStatus;
+  language?: CreateBookBodyLanguage;
   /** @nullable */
   coverUrl?: string | null;
   /** @nullable */
@@ -87,6 +108,14 @@ export const UpdateBookBodyStatus = {
   want_to_read: "want_to_read",
 } as const;
 
+export type UpdateBookBodyLanguage =
+  (typeof UpdateBookBodyLanguage)[keyof typeof UpdateBookBodyLanguage];
+
+export const UpdateBookBodyLanguage = {
+  english: "english",
+  bengali: "bengali",
+} as const;
+
 export interface UpdateBookBody {
   title?: string;
   author?: string;
@@ -99,6 +128,7 @@ export interface UpdateBookBody {
   /** @nullable */
   rating?: number | null;
   status?: UpdateBookBodyStatus;
+  language?: UpdateBookBodyLanguage;
   /** @nullable */
   coverUrl?: string | null;
   /** @nullable */
@@ -143,6 +173,10 @@ export type ListBooksParams = {
    * Filter by reading status
    */
   status?: ListBooksStatus;
+  /**
+   * Filter by language
+   */
+  language?: ListBooksLanguage;
 };
 
 export type ListBooksStatus =
@@ -152,6 +186,14 @@ export const ListBooksStatus = {
   read: "read",
   reading: "reading",
   want_to_read: "want_to_read",
+} as const;
+
+export type ListBooksLanguage =
+  (typeof ListBooksLanguage)[keyof typeof ListBooksLanguage];
+
+export const ListBooksLanguage = {
+  english: "english",
+  bengali: "bengali",
 } as const;
 
 export type ListRecentBooksParams = {

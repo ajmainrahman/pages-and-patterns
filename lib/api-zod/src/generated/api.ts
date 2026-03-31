@@ -16,6 +16,29 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
+ * @summary List all Bengali language books
+ */
+export const ListBengaliBooksResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  author: zod.string(),
+  genres: zod.array(zod.string()),
+  summary: zod.string().nullish(),
+  quotes: zod.array(zod.string()),
+  review: zod.string().nullish(),
+  rating: zod.number().nullish().describe("Rating from 1 to 5"),
+  status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
+  coverUrl: zod.string().nullish(),
+  publishedYear: zod.number().nullish(),
+  pageCount: zod.number().nullish(),
+  isFavorite: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListBengaliBooksResponse = zod.array(ListBengaliBooksResponseItem);
+
+/**
  * @summary List all books
  */
 export const ListBooksQueryParams = zod.object({
@@ -25,6 +48,10 @@ export const ListBooksQueryParams = zod.object({
     .enum(["read", "reading", "want_to_read"])
     .optional()
     .describe("Filter by reading status"),
+  language: zod
+    .enum(["english", "bengali"])
+    .optional()
+    .describe("Filter by language"),
 });
 
 export const ListBooksResponseItem = zod.object({
@@ -37,6 +64,7 @@ export const ListBooksResponseItem = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish().describe("Rating from 1 to 5"),
   status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -50,6 +78,7 @@ export const ListBooksResponse = zod.array(ListBooksResponseItem);
  * @summary Add a new book
  */
 export const createBookBodyStatusDefault = `want_to_read`;
+export const createBookBodyLanguageDefault = `english`;
 export const createBookBodyIsFavoriteDefault = false;
 
 export const CreateBookBody = zod.object({
@@ -63,6 +92,9 @@ export const CreateBookBody = zod.object({
   status: zod
     .enum(["read", "reading", "want_to_read"])
     .default(createBookBodyStatusDefault),
+  language: zod
+    .enum(["english", "bengali"])
+    .default(createBookBodyLanguageDefault),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -86,6 +118,7 @@ export const GetBookResponse = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish().describe("Rating from 1 to 5"),
   status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -110,6 +143,7 @@ export const UpdateBookBody = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish(),
   status: zod.enum(["read", "reading", "want_to_read"]).optional(),
+  language: zod.enum(["english", "bengali"]).optional(),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -126,6 +160,7 @@ export const UpdateBookResponse = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish().describe("Rating from 1 to 5"),
   status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -188,6 +223,7 @@ export const ListRecentBooksResponseItem = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish().describe("Rating from 1 to 5"),
   status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
@@ -210,6 +246,7 @@ export const ListFavoriteBooksResponseItem = zod.object({
   review: zod.string().nullish(),
   rating: zod.number().nullish().describe("Rating from 1 to 5"),
   status: zod.enum(["read", "reading", "want_to_read"]),
+  language: zod.enum(["english", "bengali"]).describe("Language of the book"),
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
