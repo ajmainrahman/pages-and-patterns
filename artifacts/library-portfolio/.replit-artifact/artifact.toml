@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Personal Library Portfolio"
+title = "Pages & Pattern"
 version = "1.0.0"
 id = "artifacts/library-portfolio"
 router = "path"
