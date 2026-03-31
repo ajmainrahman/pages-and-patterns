@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Personal Library Portfolio"
+version = "1.0.0"
+id = "artifacts/library-portfolio"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19278
+
+[services.development]
+run = "pnpm --filter @workspace/library-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/library-portfolio", "run", "build" ]
+publicDir = "artifacts/library-portfolio/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19278"
+BASE_PATH = "/"

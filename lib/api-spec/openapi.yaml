@@ -1,15 +1,18 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Personal Library Portfolio API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: books
+    description: Book management
+  - name: stats
+    description: Library statistics
 paths:
   /healthz:
     get:
@@ -24,6 +27,199 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /books:
+    get:
+      operationId: listBooks
+      tags: [books]
+      summary: List all books
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by title or author
+        - in: query
+          name: genre
+          schema:
+            type: string
+          description: Filter by genre
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [read, reading, want_to_read]
+          description: Filter by reading status
+      responses:
+        "200":
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      operationId: createBook
+      tags: [books]
+      summary: Add a new book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookBody"
+      responses:
+        "201":
+          description: Created book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /books/{id}:
+    get:
+      operationId: getBook
+      tags: [books]
+      summary: Get a book by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Book details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateBook
+      tags: [books]
+      summary: Update a book
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookBody"
+      responses:
+        "200":
+          description: Updated book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBook
+      tags: [books]
+      summary: Delete a book
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get library statistics
+      responses:
+        "200":
+          description: Library stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LibraryStats"
+
+  /books/genres:
+    get:
+      operationId: listGenres
+      tags: [books]
+      summary: List all unique genres
+      responses:
+        "200":
+          description: List of genres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /books/recent:
+    get:
+      operationId: listRecentBooks
+      tags: [books]
+      summary: List recently added books
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Max results (default 5)
+      responses:
+        "200":
+          description: Recent books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+
+  /books/favorites:
+    get:
+      operationId: listFavoriteBooks
+      tags: [books]
+      summary: List top-rated (favorite) books
+      responses:
+        "200":
+          description: Favorite books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +230,187 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        summary:
+          type: ["string", "null"]
+        quotes:
+          type: array
+          items:
+            type: string
+        review:
+          type: ["string", "null"]
+        rating:
+          type: ["integer", "null"]
+          description: Rating from 1 to 5
+        status:
+          type: string
+          enum: [read, reading, want_to_read]
+        coverUrl:
+          type: ["string", "null"]
+        publishedYear:
+          type: ["integer", "null"]
+        pageCount:
+          type: ["integer", "null"]
+        isFavorite:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - author
+        - genres
+        - quotes
+        - status
+        - isFavorite
+        - createdAt
+        - updatedAt
+
+    CreateBookBody:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        summary:
+          type: ["string", "null"]
+        quotes:
+          type: array
+          items:
+            type: string
+        review:
+          type: ["string", "null"]
+        rating:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [read, reading, want_to_read]
+          default: want_to_read
+        coverUrl:
+          type: ["string", "null"]
+        publishedYear:
+          type: ["integer", "null"]
+        pageCount:
+          type: ["integer", "null"]
+        isFavorite:
+          type: boolean
+          default: false
+      required:
+        - title
+        - author
+
+    UpdateBookBody:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        summary:
+          type: ["string", "null"]
+        quotes:
+          type: array
+          items:
+            type: string
+        review:
+          type: ["string", "null"]
+        rating:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [read, reading, want_to_read]
+        coverUrl:
+          type: ["string", "null"]
+        publishedYear:
+          type: ["integer", "null"]
+        pageCount:
+          type: ["integer", "null"]
+        isFavorite:
+          type: boolean
+
+    LibraryStats:
+      type: object
+      properties:
+        totalBooks:
+          type: integer
+        booksRead:
+          type: integer
+        booksReading:
+          type: integer
+        booksWantToRead:
+          type: integer
+        averageRating:
+          type: ["number", "null"]
+        totalPages:
+          type: integer
+        genreBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenreCount"
+        topAuthors:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuthorCount"
+      required:
+        - totalBooks
+        - booksRead
+        - booksReading
+        - booksWantToRead
+        - totalPages
+        - genreBreakdown
+        - topAuthors
+
+    GenreCount:
+      type: object
+      properties:
+        genre:
+          type: string
+        count:
+          type: integer
+      required:
+        - genre
+        - count
+
+    AuthorCount:
+      type: object
+      properties:
+        author:
+          type: string
+        count:
+          type: integer
+      required:
+        - author
+        - count
