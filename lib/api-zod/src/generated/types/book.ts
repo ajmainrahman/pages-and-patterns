@@ -32,6 +32,16 @@ export interface Book {
   publishedYear?: number | null;
   /** @nullable */
   pageCount?: number | null;
+  /**
+   * Current page the reader is on
+   * @nullable
+   */
+  currentPage?: number | null;
+  /**
+   * Target date to finish the book (YYYY-MM-DD)
+   * @nullable
+   */
+  readingDeadline?: string | null;
   isFavorite: boolean;
   createdAt: Date;
   updatedAt: Date;

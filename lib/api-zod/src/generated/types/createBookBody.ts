@@ -27,5 +27,9 @@ export interface CreateBookBody {
   publishedYear?: number | null;
   /** @nullable */
   pageCount?: number | null;
+  /** @nullable */
+  currentPage?: number | null;
+  /** @nullable */
+  readingDeadline?: string | null;
   isFavorite?: boolean;
 }

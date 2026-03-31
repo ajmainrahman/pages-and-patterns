@@ -49,16 +49,33 @@ export function BookCard({ book, index = 0, bengali = false }: { book: Book, ind
               <h3 className={`font-bold text-lg leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors ${bengali || book.language === 'bengali' ? 'font-bengali' : 'font-serif'}`}>{book.title}</h3>
               <p className={`text-sm text-muted-foreground mb-4 line-clamp-1 ${bengali || book.language === 'bengali' ? 'font-bengali' : ''}`}>{book.author}</p>
               
-              <div className="mt-auto flex flex-wrap gap-1.5">
-                {book.genres?.slice(0, 2).map(g => (
-                  <span key={g} className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium tracking-wide uppercase">
-                    {g}
-                  </span>
-                ))}
-                {(book.genres?.length ?? 0) > 2 && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium">
-                    +{(book.genres?.length ?? 0) - 2}
-                  </span>
+              <div className="mt-auto space-y-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {book.genres?.slice(0, 2).map(g => (
+                    <span key={g} className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium tracking-wide uppercase">
+                      {g}
+                    </span>
+                  ))}
+                  {(book.genres?.length ?? 0) > 2 && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium">
+                      +{(book.genres?.length ?? 0) - 2}
+                    </span>
+                  )}
+                </div>
+
+                {book.status === "reading" && book.pageCount && book.pageCount > 0 && book.currentPage != null && (
+                  <div className="space-y-1 pt-1">
+                    <div className="flex justify-between text-[10px] text-muted-foreground">
+                      <span>p. {book.currentPage} / {book.pageCount}</span>
+                      <span>{Math.round((book.currentPage / book.pageCount) * 100)}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, Math.round((book.currentPage / book.pageCount) * 100))}%` }}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, Target } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -26,6 +26,8 @@ const formSchema = z.object({
   coverUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   publishedYear: z.coerce.number().optional().or(z.literal(0)),
   pageCount: z.coerce.number().optional().or(z.literal(0)),
+  currentPage: z.coerce.number().optional().or(z.literal(0)),
+  readingDeadline: z.string().optional(),
   isFavorite: z.boolean().default(false),
   quotes: z.string().optional() 
 });
@@ -50,6 +52,8 @@ export default function AddBook() {
       coverUrl: "",
       publishedYear: 0,
       pageCount: 0,
+      currentPage: 0,
+      readingDeadline: "",
       isFavorite: false,
       quotes: ""
     }
@@ -68,6 +72,8 @@ export default function AddBook() {
       coverUrl: values.coverUrl || null,
       publishedYear: values.publishedYear || null,
       pageCount: values.pageCount || null,
+      currentPage: values.currentPage || null,
+      readingDeadline: values.readingDeadline || null,
       isFavorite: values.isFavorite,
       quotes: values.quotes ? values.quotes.split("\n").map(q => q.trim()).filter(Boolean) : [],
     };
@@ -246,12 +252,29 @@ export default function AddBook() {
                 )} />
                 <FormField control={form.control} name="pageCount" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Page Count</FormLabel>
+                    <FormLabel>Total Pages</FormLabel>
                     <FormControl><Input type="number" className="bg-background" {...field} value={field.value || ""} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="currentPage" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Page</FormLabel>
+                    <FormControl><Input type="number" min={0} className="bg-background" placeholder="e.g. 120" {...field} value={field.value || ""} /></FormControl>
+                    <FormDescription>How far you've read</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )} />
               </div>
+              
+              <FormField control={form.control} name="readingDeadline" render={({ field }) => (
+                <FormItem className="max-w-xs">
+                  <FormLabel className="flex items-center gap-2"><Target className="w-3.5 h-3.5" /> Reading Deadline</FormLabel>
+                  <FormControl><Input type="date" className="bg-background" {...field} value={field.value || ""} /></FormControl>
+                  <FormDescription>Target date to finish this book</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
               
               <FormField control={form.control} name="summary" render={({ field }) => (
                 <FormItem>

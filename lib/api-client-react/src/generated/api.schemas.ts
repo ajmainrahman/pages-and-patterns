@@ -55,6 +55,16 @@ export interface Book {
   publishedYear?: number | null;
   /** @nullable */
   pageCount?: number | null;
+  /**
+   * Current page the reader is on
+   * @nullable
+   */
+  currentPage?: number | null;
+  /**
+   * Target date to finish the book (YYYY-MM-DD)
+   * @nullable
+   */
+  readingDeadline?: string | null;
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string;
@@ -96,6 +106,10 @@ export interface CreateBookBody {
   publishedYear?: number | null;
   /** @nullable */
   pageCount?: number | null;
+  /** @nullable */
+  currentPage?: number | null;
+  /** @nullable */
+  readingDeadline?: string | null;
   isFavorite?: boolean;
 }
 
@@ -135,6 +149,10 @@ export interface UpdateBookBody {
   publishedYear?: number | null;
   /** @nullable */
   pageCount?: number | null;
+  /** @nullable */
+  currentPage?: number | null;
+  /** @nullable */
+  readingDeadline?: string | null;
   isFavorite?: boolean;
 }
 

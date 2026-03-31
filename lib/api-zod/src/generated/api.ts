@@ -32,6 +32,11 @@ export const ListBengaliBooksResponseItem = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -68,6 +73,11 @@ export const ListBooksResponseItem = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -98,6 +108,8 @@ export const CreateBookBody = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish(),
+  readingDeadline: zod.string().nullish(),
   isFavorite: zod.boolean().default(createBookBodyIsFavoriteDefault),
 });
 
@@ -122,6 +134,11 @@ export const GetBookResponse = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -147,6 +164,8 @@ export const UpdateBookBody = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish(),
+  readingDeadline: zod.string().nullish(),
   isFavorite: zod.boolean().optional(),
 });
 
@@ -164,6 +183,11 @@ export const UpdateBookResponse = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -227,6 +251,11 @@ export const ListRecentBooksResponseItem = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
@@ -250,6 +279,11 @@ export const ListFavoriteBooksResponseItem = zod.object({
   coverUrl: zod.string().nullish(),
   publishedYear: zod.number().nullish(),
   pageCount: zod.number().nullish(),
+  currentPage: zod.number().nullish().describe("Current page the reader is on"),
+  readingDeadline: zod
+    .string()
+    .nullish()
+    .describe("Target date to finish the book (YYYY-MM-DD)"),
   isFavorite: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),

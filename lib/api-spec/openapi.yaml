@@ -296,6 +296,12 @@ components:
           type: ["integer", "null"]
         pageCount:
           type: ["integer", "null"]
+        currentPage:
+          type: ["integer", "null"]
+          description: Current page the reader is on
+        readingDeadline:
+          type: ["string", "null"]
+          description: Target date to finish the book (YYYY-MM-DD)
         isFavorite:
           type: boolean
         createdAt:
@@ -351,6 +357,10 @@ components:
           type: ["integer", "null"]
         pageCount:
           type: ["integer", "null"]
+        currentPage:
+          type: ["integer", "null"]
+        readingDeadline:
+          type: ["string", "null"]
         isFavorite:
           type: boolean
           default: false
@@ -391,6 +401,10 @@ components:
           type: ["integer", "null"]
         pageCount:
           type: ["integer", "null"]
+        currentPage:
+          type: ["integer", "null"]
+        readingDeadline:
+          type: ["string", "null"]
         isFavorite:
           type: boolean
 

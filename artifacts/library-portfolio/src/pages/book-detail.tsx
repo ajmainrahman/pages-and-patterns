@@ -1,7 +1,9 @@
 import { useRoute, Link, useLocation } from "wouter";
+import { useState } from "react";
 import { 
   useGetBook, 
-  useDeleteBook, 
+  useDeleteBook,
+  useUpdateBook,
   getGetBookQueryKey,
   getListBooksQueryKey, 
   getListRecentBooksQueryKey, 
@@ -11,11 +13,204 @@ import {
 import { StatusBadge } from "@/components/status-badge";
 import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, differenceInDays, parseISO, isValid } from "date-fns";
+
+function ReadingProgress({ bookId, currentPage, pageCount, onUpdate }: {
+  bookId: number;
+  currentPage: number | null | undefined;
+  pageCount: number | null | undefined;
+  onUpdate: (page: number) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(String(currentPage ?? ""));
+
+  const progress = (pageCount && currentPage) ? Math.min(100, Math.round((currentPage / pageCount) * 100)) : 0;
+
+  const handleSave = () => {
+    const p = parseInt(inputVal, 10);
+    if (!isNaN(p) && p >= 0) {
+      onUpdate(p);
+    }
+    setEditing(false);
+  };
+
+  return (
+    <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <BookOpen className="w-3.5 h-3.5" /> Reading Progress
+        </h4>
+        {!editing && (
+          <button onClick={() => { setInputVal(String(currentPage ?? "")); setEditing(true); }}
+            className="text-muted-foreground hover:text-primary transition-colors">
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      <div className="flex items-end gap-2">
+        {editing ? (
+          <div className="flex items-center gap-2 w-full">
+            <Input
+              type="number"
+              value={inputVal}
+              min={0}
+              max={pageCount ?? undefined}
+              onChange={e => setInputVal(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setEditing(false); }}
+              className="h-8 w-24 text-sm"
+              autoFocus
+            />
+            {pageCount && <span className="text-sm text-muted-foreground">/ {pageCount} pages</span>}
+            <Button size="sm" className="h-8 ml-auto" onClick={handleSave}>Save</Button>
+            <Button size="sm" variant="ghost" className="h-8" onClick={() => setEditing(false)}>Cancel</Button>
+          </div>
+        ) : (
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-bold font-serif text-foreground">{currentPage ?? 0}</span>
+            {pageCount && <span className="text-muted-foreground text-sm">/ {pageCount} pages</span>}
+          </div>
+        )}
+      </div>
+
+      {pageCount && pageCount > 0 && (
+        <>
+          <div className="relative w-full h-2.5 bg-secondary rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute inset-y-0 left-0 bg-primary rounded-full"
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{progress}% complete</span>
+            <span>{Math.max(0, (pageCount) - (currentPage ?? 0))} pages left</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function DeadlineTracker({ bookId, deadline, currentPage, pageCount, onUpdate }: {
+  bookId: number;
+  deadline: string | null | undefined;
+  currentPage: number | null | undefined;
+  pageCount: number | null | undefined;
+  onUpdate: (deadline: string | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(deadline ?? "");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const deadlineDate = deadline ? parseISO(deadline) : null;
+  const isValidDeadline = deadlineDate && isValid(deadlineDate);
+  const daysLeft = isValidDeadline ? differenceInDays(deadlineDate, today) : null;
+  const pagesLeft = pageCount && currentPage != null ? Math.max(0, pageCount - currentPage) : null;
+  const dailyTarget = (daysLeft != null && daysLeft > 0 && pagesLeft != null) ? Math.ceil(pagesLeft / daysLeft) : null;
+  const isOverdue = daysLeft != null && daysLeft < 0;
+  const isDoneToday = daysLeft === 0;
+
+  const handleSave = () => {
+    onUpdate(inputVal || null);
+    setEditing(false);
+  };
+
+  const handleClear = () => {
+    onUpdate(null);
+    setInputVal("");
+    setEditing(false);
+  };
+
+  return (
+    <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <Target className="w-3.5 h-3.5" /> Reading Deadline
+        </h4>
+        {!editing && (
+          <button onClick={() => { setInputVal(deadline ?? ""); setEditing(true); }}
+            className="text-muted-foreground hover:text-primary transition-colors">
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {editing ? (
+        <div className="space-y-3">
+          <Input
+            type="date"
+            value={inputVal}
+            min={format(today, "yyyy-MM-dd")}
+            onChange={e => setInputVal(e.target.value)}
+            className="h-8 text-sm"
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <Button size="sm" className="h-8 flex-1" onClick={handleSave}>Set Deadline</Button>
+            {deadline && <Button size="sm" variant="outline" className="h-8" onClick={handleClear}>Clear</Button>}
+            <Button size="sm" variant="ghost" className="h-8" onClick={() => setEditing(false)}>Cancel</Button>
+          </div>
+        </div>
+      ) : !isValidDeadline ? (
+        <button
+          onClick={() => setEditing(true)}
+          className="w-full border-2 border-dashed border-border rounded-xl py-4 text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex items-center justify-center gap-2"
+        >
+          <Flag className="w-4 h-4" /> Set a reading deadline
+        </button>
+      ) : (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 text-sm">
+            <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="font-medium">{format(deadlineDate!, "MMMM d, yyyy")}</span>
+          </div>
+
+          {isOverdue ? (
+            <div className="bg-destructive/10 text-destructive rounded-xl p-4 text-sm font-medium flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Overdue by {Math.abs(daysLeft!)} {Math.abs(daysLeft!) === 1 ? "day" : "days"}
+            </div>
+          ) : isDoneToday ? (
+            <div className="bg-amber-500/10 text-amber-600 rounded-xl p-4 text-sm font-medium flex items-center gap-2">
+              <Flag className="w-4 h-4" />
+              Deadline is today!
+            </div>
+          ) : (
+            <div className="bg-primary/5 rounded-xl p-4 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Days remaining</span>
+                <span className="font-bold text-foreground text-xl">{daysLeft}</span>
+              </div>
+              {dailyTarget != null && pagesLeft != null && (
+                <>
+                  <div className="h-px bg-border" />
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Daily target</span>
+                    <span className="font-semibold text-primary">{dailyTarget} pages/day</span>
+                  </div>
+                  {pagesLeft === 0 && (
+                    <div className="flex items-center gap-2 text-sm text-green-600 font-medium pt-1">
+                      <CheckCircle2 className="w-4 h-4" /> All pages read!
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function BookDetail() {
   const [, params] = useRoute("/books/:id");
@@ -29,6 +224,12 @@ export default function BookDetail() {
   });
 
   const deleteMutation = useDeleteBook();
+  const updateMutation = useUpdateBook();
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: getGetBookQueryKey(id) });
+    queryClient.invalidateQueries({ queryKey: getListBooksQueryKey() });
+  };
 
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to remove "${book?.title}" from your library?`)) {
@@ -43,6 +244,24 @@ export default function BookDetail() {
         }
       });
     }
+  };
+
+  const handleCurrentPageUpdate = (currentPage: number) => {
+    updateMutation.mutate({ id, data: { currentPage } }, {
+      onSuccess: () => {
+        toast({ title: "Progress updated" });
+        invalidate();
+      }
+    });
+  };
+
+  const handleDeadlineUpdate = (readingDeadline: string | null) => {
+    updateMutation.mutate({ id, data: { readingDeadline } }, {
+      onSuccess: () => {
+        toast({ title: readingDeadline ? "Deadline set" : "Deadline cleared" });
+        invalidate();
+      }
+    });
   };
 
   if (isLoading) {
@@ -72,6 +291,8 @@ export default function BookDetail() {
     );
   }
 
+  const showProgress = book.status === "reading" || (book.currentPage != null && book.currentPage > 0);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} 
@@ -99,7 +320,7 @@ export default function BookDetail() {
 
       <div className="flex flex-col md:flex-row gap-8 md:gap-16">
         {/* Left Column: Cover & Meta */}
-        <div className="w-full md:w-1/3 shrink-0 space-y-6">
+        <div className="w-full md:w-1/3 shrink-0 space-y-4">
           <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-xl bg-secondary flex items-center justify-center">
             {book.coverUrl ? (
               <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
@@ -129,6 +350,25 @@ export default function BookDetail() {
               <span>Added {format(new Date(book.createdAt), 'MMM d, yyyy')}</span>
             </div>
           </div>
+
+          {showProgress && (
+            <ReadingProgress
+              bookId={id}
+              currentPage={book.currentPage}
+              pageCount={book.pageCount}
+              onUpdate={handleCurrentPageUpdate}
+            />
+          )}
+
+          {(book.status === "reading" || book.readingDeadline) && (
+            <DeadlineTracker
+              bookId={id}
+              deadline={book.readingDeadline}
+              currentPage={book.currentPage}
+              pageCount={book.pageCount}
+              onUpdate={handleDeadlineUpdate}
+            />
+          )}
         </div>
 
         {/* Right Column: Content */}
@@ -139,10 +379,10 @@ export default function BookDetail() {
             <StarRating rating={book.rating} />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2 leading-tight">
+          <h1 className={`text-4xl md:text-5xl font-bold text-foreground mb-2 leading-tight ${book.language === "bengali" ? "font-bengali" : "font-serif"}`}>
             {book.title}
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground font-serif italic mb-8">
+          <p className={`text-xl md:text-2xl text-muted-foreground italic mb-8 ${book.language === "bengali" ? "font-bengali" : "font-serif"}`}>
             by {book.author}
           </p>
           

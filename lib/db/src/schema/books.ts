@@ -16,6 +16,8 @@ export const booksTable = pgTable("books", {
   coverUrl: text("cover_url"),
   publishedYear: integer("published_year"),
   pageCount: integer("page_count"),
+  currentPage: integer("current_page"),
+  readingDeadline: text("reading_deadline"),
   isFavorite: boolean("is_favorite").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
