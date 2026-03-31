@@ -266,6 +266,32 @@ export const GetStatsResponse = zod.object({
       count: zod.number(),
     }),
   ),
+  booksPerMonth: zod.array(
+    zod.object({
+      month: zod.string(),
+      count: zod.number(),
+    }),
+  ),
+  ratingDistribution: zod.array(
+    zod.object({
+      rating: zod.number(),
+      count: zod.number(),
+    }),
+  ),
+  languageBreakdown: zod.array(
+    zod.object({
+      language: zod.string(),
+      count: zod.number(),
+    }),
+  ),
+  formatBreakdown: zod.array(
+    zod.object({
+      format: zod.string(),
+      count: zod.number(),
+    }),
+  ),
+  pagesReadTotal: zod.number(),
+  avgPagesPerBook: zod.number(),
 });
 
 /**

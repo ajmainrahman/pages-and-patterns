@@ -459,6 +459,26 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AuthorCount"
+        booksPerMonth:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthCount"
+        ratingDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/RatingCount"
+        languageBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/LangCount"
+        formatBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/FormatCount"
+        pagesReadTotal:
+          type: integer
+        avgPagesPerBook:
+          type: integer
       required:
         - totalBooks
         - booksRead
@@ -467,6 +487,12 @@ components:
         - totalPages
         - genreBreakdown
         - topAuthors
+        - booksPerMonth
+        - ratingDistribution
+        - languageBreakdown
+        - formatBreakdown
+        - pagesReadTotal
+        - avgPagesPerBook
 
     GenreCount:
       type: object
@@ -488,4 +514,48 @@ components:
           type: integer
       required:
         - author
+        - count
+
+    MonthCount:
+      type: object
+      properties:
+        month:
+          type: string
+        count:
+          type: integer
+      required:
+        - month
+        - count
+
+    RatingCount:
+      type: object
+      properties:
+        rating:
+          type: integer
+        count:
+          type: integer
+      required:
+        - rating
+        - count
+
+    LangCount:
+      type: object
+      properties:
+        language:
+          type: string
+        count:
+          type: integer
+      required:
+        - language
+        - count
+
+    FormatCount:
+      type: object
+      properties:
+        format:
+          type: string
+        count:
+          type: integer
+      required:
+        - format
         - count

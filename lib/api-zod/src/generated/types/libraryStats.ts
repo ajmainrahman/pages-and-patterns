@@ -6,7 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AuthorCount } from "./authorCount";
+import type { FormatCount } from "./formatCount";
 import type { GenreCount } from "./genreCount";
+import type { LangCount } from "./langCount";
+import type { MonthCount } from "./monthCount";
+import type { RatingCount } from "./ratingCount";
 
 export interface LibraryStats {
   totalBooks: number;
@@ -18,4 +22,10 @@ export interface LibraryStats {
   totalPages: number;
   genreBreakdown: GenreCount[];
   topAuthors: AuthorCount[];
+  booksPerMonth: MonthCount[];
+  ratingDistribution: RatingCount[];
+  languageBreakdown: LangCount[];
+  formatBreakdown: FormatCount[];
+  pagesReadTotal: number;
+  avgPagesPerBook: number;
 }

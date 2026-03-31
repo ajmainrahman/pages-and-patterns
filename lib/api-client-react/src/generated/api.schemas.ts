@@ -218,6 +218,26 @@ export interface AuthorCount {
   count: number;
 }
 
+export interface MonthCount {
+  month: string;
+  count: number;
+}
+
+export interface RatingCount {
+  rating: number;
+  count: number;
+}
+
+export interface LangCount {
+  language: string;
+  count: number;
+}
+
+export interface FormatCount {
+  format: string;
+  count: number;
+}
+
 export interface LibraryStats {
   totalBooks: number;
   booksRead: number;
@@ -228,6 +248,12 @@ export interface LibraryStats {
   totalPages: number;
   genreBreakdown: GenreCount[];
   topAuthors: AuthorCount[];
+  booksPerMonth: MonthCount[];
+  ratingDistribution: RatingCount[];
+  languageBreakdown: LangCount[];
+  formatBreakdown: FormatCount[];
+  pagesReadTotal: number;
+  avgPagesPerBook: number;
 }
 
 export type ListBooksParams = {

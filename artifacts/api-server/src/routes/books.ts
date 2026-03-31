@@ -201,6 +201,19 @@ router.get("/stats", async (_req, res): Promise<void> => {
 
   const totalPages = allBooks.reduce((sum, b) => sum + (b.pageCount ?? 0), 0);
 
+  // Pages read = sum of pageCount for "read" books
+  const pagesReadTotal = allBooks
+    .filter((b) => b.status === "read")
+    .reduce((sum, b) => sum + (b.pageCount ?? 0), 0);
+
+  // Average pages per book (only books with a pageCount)
+  const booksWithPages = allBooks.filter((b) => b.pageCount != null && b.pageCount > 0);
+  const avgPagesPerBook =
+    booksWithPages.length > 0
+      ? Math.round(booksWithPages.reduce((sum, b) => sum + (b.pageCount ?? 0), 0) / booksWithPages.length)
+      : 0;
+
+  // Genre breakdown
   const genreMap = new Map<string, number>();
   allBooks.forEach((b) => {
     b.genres.forEach((g) => {
@@ -211,6 +224,7 @@ router.get("/stats", async (_req, res): Promise<void> => {
     .map(([genre, count]) => ({ genre, count }))
     .sort((a, b) => b.count - a.count);
 
+  // Top authors
   const authorMap = new Map<string, number>();
   allBooks.forEach((b) => {
     authorMap.set(b.author, (authorMap.get(b.author) ?? 0) + 1);
@@ -219,6 +233,56 @@ router.get("/stats", async (_req, res): Promise<void> => {
     .map(([author, count]) => ({ author, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
+
+  // Books added per month — last 12 months
+  const now = new Date();
+  const monthLabels: { key: string; label: string }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
+    monthLabels.push({ key, label });
+  }
+  const monthMap = new Map<string, number>(monthLabels.map((m) => [m.key, 0]));
+  allBooks.forEach((b) => {
+    const d = new Date(b.createdAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (monthMap.has(key)) {
+      monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
+    }
+  });
+  const booksPerMonth = monthLabels.map(({ key, label }) => ({
+    month: label,
+    count: monthMap.get(key) ?? 0,
+  }));
+
+  // Rating distribution (1–5 stars)
+  const ratingMap = new Map<number, number>([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0]]);
+  allBooks.forEach((b) => {
+    if (b.rating != null && b.rating >= 1 && b.rating <= 5) {
+      ratingMap.set(b.rating, (ratingMap.get(b.rating) ?? 0) + 1);
+    }
+  });
+  const ratingDistribution = Array.from(ratingMap.entries())
+    .map(([rating, count]) => ({ rating, count }))
+    .sort((a, b) => a.rating - b.rating);
+
+  // Language breakdown
+  const langMap = new Map<string, number>();
+  allBooks.forEach((b) => {
+    langMap.set(b.language, (langMap.get(b.language) ?? 0) + 1);
+  });
+  const languageBreakdown = Array.from(langMap.entries()).map(([language, count]) => ({ language, count }));
+
+  // Format breakdown
+  const fmtMap = new Map<string, number>([["physical", 0], ["pdf", 0], ["unspecified", 0]]);
+  allBooks.forEach((b) => {
+    const key = b.format ?? "unspecified";
+    fmtMap.set(key, (fmtMap.get(key) ?? 0) + 1);
+  });
+  const formatBreakdown = Array.from(fmtMap.entries())
+    .map(([format, count]) => ({ format, count }))
+    .filter((f) => f.count > 0);
 
   res.json(
     GetStatsResponse.parse({
@@ -230,6 +294,12 @@ router.get("/stats", async (_req, res): Promise<void> => {
       totalPages,
       genreBreakdown,
       topAuthors,
+      booksPerMonth,
+      ratingDistribution,
+      languageBreakdown,
+      formatBreakdown,
+      pagesReadTotal,
+      avgPagesPerBook,
     })
   );
 });
