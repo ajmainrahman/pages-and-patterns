@@ -25,18 +25,21 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
 │   ├── api-server/         # Express API server (port 8080, PostgreSQL + Drizzle)
+│   │   └── build-vercel.mjs  # esbuild script: bundles Express app → api/index.js
 │   └── library-portfolio/  # Personal Library Portfolio (React + Vite)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks (used by library-portfolio)
 │   ├── api-zod/            # Generated Zod schemas from OpenAPI
-│   └── db/                 # Drizzle ORM schema + DB connection
+│   └── db/                 # Drizzle ORM schema + DB connection (pg + Drizzle)
 ├── scripts/                # Utility scripts
 │   └── push-to-github.sh   # GitHub push via GITHUB_TOKEN
 ├── api/
-│   └── index.ts            # Vercel serverless entry — re-exports Express app
+│   └── package.json        # {"type":"module"} — marks the Vercel function dir as ESM
 └── vercel.json             # Vercel build config: frontend build + API rewrite + SPA fallback
 ```
+
+> `api/index.js` is **gitignored** — it's generated at build time by `build:vercel` script.
 
 ## Key Files
 
@@ -67,12 +70,40 @@ artifacts-monorepo/
 - Genre filtering, search, status filtering
 - Stats charts (Recharts): rating distribution, genre breakdown, monthly trends, donut charts
 
-## Deployment (Vercel)
+## Deployment: GitHub + Vercel + Neon
 
-- `vercel.json` builds the Vite frontend to `public/`
-- `api/index.ts` exports the Express app as a Vercel serverless function
-- `/api/*` routes rewrite to the serverless function
-- All other routes fall through to `index.html` (SPA routing)
+### How it works
+- Vercel runs the `buildCommand` from `vercel.json`:
+  1. Builds the React/Vite frontend → outputs to `public/`
+  2. Bundles Express app via esbuild → generates `api/index.js` (ESM serverless function)
+- `api/package.json` (`{"type":"module"}`) tells Vercel/Node.js the function is ESM
+- `/api/*` requests rewrite to the `api/index.js` serverless function
+- All other routes fall through to `index.html` (SPA routing via the second rewrite)
+
+### Vercel setup checklist
+1. Import the GitHub repo in Vercel
+2. Set **Framework Preset** to **"Other"** (not Vite, not Express)
+3. Leave Build/Output fields blank — `vercel.json` controls everything
+4. Add these **Environment Variables**:
+   - `DATABASE_URL` → your Neon connection string (e.g. `postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require`)
+   - `SESSION_SECRET` → any long random string (e.g. 64 random chars)
+   - `NODE_ENV` is set to `production` automatically by Vercel — no need to add it
+5. Deploy
+
+### Neon database setup
+1. Create a project at [neon.tech](https://neon.tech)
+2. Copy the **connection string** from the Neon dashboard (includes `?sslmode=require`)
+3. **Run migrations once** to create tables — in this Replit shell:
+   ```bash
+   DATABASE_URL="your-neon-connection-string" pnpm --filter @workspace/db run push-force
+   ```
+4. Use the same `DATABASE_URL` value in Vercel's environment variables
+
+### Push to GitHub
+```bash
+bash scripts/push-to-github.sh "your commit message"
+```
+The `GITHUB_TOKEN` secret is already configured in this Replit environment.
 
 ## Important Notes
 
