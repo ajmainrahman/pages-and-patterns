@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pages-and-patterns
+    runtime: node
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @workspace/library-portfolio run build && pnpm --filter @workspace/api-server run build
+    startCommand: node --enable-source-maps artifacts/api-server/dist/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
