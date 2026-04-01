@@ -1,15 +1,16 @@
 {
-  "framework": "vite",
   "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
   "outputDirectory": "artifacts/library-portfolio/dist/public",
+  "installCommand": "pnpm install",
   "functions": {
     "api/index.ts": {
       "runtime": "nodejs20.x",
       "maxDuration": 30
     }
   },
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
