@@ -87,8 +87,10 @@ export default function AddBook() {
         toast({ title: "Added to Library", description: `"${newBook.title}" has been cataloged.` });
         setLocation(`/books/${newBook.id}`);
       },
-      onError: () => {
-        toast({ title: "Error", description: "Failed to add book. Please check your inputs.", variant: "destructive" });
+      onError: (err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : "Unknown error";
+        toast({ title: "Failed to add book", description: message, variant: "destructive" });
       },
     });
   };
