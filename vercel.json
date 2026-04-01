@@ -1,4 +1,5 @@
 {
+  "framework": "vite",
   "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
   "outputDirectory": "artifacts/library-portfolio/dist/public",
   "functions": {
