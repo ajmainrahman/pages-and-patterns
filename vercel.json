@@ -1,13 +1,8 @@
 {
   "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
   "installCommand": "pnpm install",
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "public/**",
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
