@@ -1,8 +1,8 @@
 {
   "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
+  "outputDirectory": "public",
   "installCommand": "pnpm install",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -10,59 +10,77 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
 - **Frontend**: React + Vite + Tailwind CSS + shadcn/ui + Framer Motion + Recharts
+- **API framework**: Express 5 (api-server artifact, NOT used by library-portfolio)
+- **Database**: PostgreSQL + Drizzle ORM (NOT used by library-portfolio)
 
 ## Structure
 
 ```text
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
-│   ├── api-server/         # Express API server
-│   └── library-portfolio/  # Personal Library Portfolio (React + Vite)
-├── lib/                    # Shared libraries
+│   ├── api-server/         # Express API server (standalone, not used by library-portfolio)
+│   └── library-portfolio/  # Personal Library Portfolio (React + Vite, fully static)
+├── lib/                    # Shared libraries (NOT used by library-portfolio)
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
-│   ├── api-client-react/   # Generated React Query hooks
+│   ├── api-client-react/   # Generated React Query hooks (NOT used by library-portfolio)
 │   ├── api-zod/            # Generated Zod schemas from OpenAPI
 │   └── db/                 # Drizzle ORM schema + DB connection
 ├── scripts/                # Utility scripts
+│   └── push-to-github.sh   # GitHub push via GITHUB_TOKEN
+├── api/index.ts            # Vercel stub (unused - static site)
+├── vercel.json             # Vercel static site config
+├── public/                 # Vite build output (gitignored in production)
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json
 ├── tsconfig.json
 └── package.json
 ```
 
-## Personal Library Portfolio
+## Personal Library Portfolio (`artifacts/library-portfolio`)
 
-A full-stack web app for cataloging personal book collections.
+A **fully static** web app for cataloging personal book collections. No server or database required — all data stored in browser `localStorage`.
+
+### Architecture
+
+- **Data layer**: `src/lib/store.ts` — localStorage CRUD (createBook, updateBook, deleteBook, getBooks, computeStats)
+- **React hooks**: `src/lib/hooks.ts` — custom React hooks (useListBooks, useGetBook, useGetStats, useCreateBook, etc.) using localStorage + browser `books-updated` event for reactivity
+- **Build output**: `public/` (configured in vite.config.ts)
+- **Deployment**: Vercel static site via `vercel.json`
 
 ### Features
 - Store books with title, author, genres, summary, quotes, and reviews
 - Star ratings (1–5), reading status (read/reading/want to read), favorites
 - Dashboard with library stats (total books, avg rating, reading progress)
 - Library page with search and filter by genre/status
-- Book detail page with all information, quotes, and review
-- Add/edit book form
-- Stats page with genre breakdown and top authors charts
+- Book detail page with reading progress tracker, deadline tracker
+- Add/edit book form with full field set
+- Bengali books section with Bengali typography (Hind Siliguri font)
+- Stats page with Recharts: genre breakdown, rating distribution, monthly trend, language/format donut charts
 - Warm literary aesthetic (burgundy, cream, serif typography)
 
-### Data Model (books table)
-- id, title, author, genres[], summary, quotes[], review, rating (1-5)
-- status: "read" | "reading" | "want_to_read"
-- coverUrl, publishedYear, pageCount, isFavorite
-- createdAt, updatedAt
+### Data Storage
+- All data stored in `localStorage` under key `pages-and-patterns-books`
+- Event `books-updated` fired on every write to trigger React re-renders
+- No external services, no API calls at runtime
 
-### API Endpoints
-- GET/POST /api/books — list (with search/genre/status filters) and create
-- GET/PATCH/DELETE /api/books/:id — get, update, delete
-- GET /api/books/genres — list all unique genres
-- GET /api/books/recent — recently added books
-- GET /api/books/favorites — favorited books
-- GET /api/stats — full library statistics
+### Deployment (Vercel)
+```json
+{
+  "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
+  "outputDirectory": "public",
+  "installCommand": "pnpm install",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+To push to GitHub for Vercel deployment:
+```bash
+bash scripts/push-to-github.sh "commit message"
+```
+
+### Key Fix: Vite Config Compatibility
+`vite.config.ts` uses `fileURLToPath(import.meta.url)` instead of `import.meta.dirname` for Node 18+ compatibility.
 
 ## TypeScript & Composite Projects
 
@@ -72,33 +90,3 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
-
-## Packages
-
-### `artifacts/api-server` (`@workspace/api-server`)
-
-Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` for request and response validation and `@workspace/db` for persistence.
-
-### `artifacts/library-portfolio` (`@workspace/library-portfolio`)
-
-React + Vite frontend. Serves the Personal Library Portfolio at `/`. Uses generated React Query hooks from `@workspace/api-client-react`.
-
-### `lib/db` (`@workspace/db`)
-
-Database layer using Drizzle ORM with PostgreSQL.
-
-- Schema: `lib/db/src/schema/books.ts` — books table
-- Push dev schema: `pnpm --filter @workspace/db run push`
-
-### `lib/api-spec` (`@workspace/api-spec`)
-
-Owns the OpenAPI 3.1 spec (`openapi.yaml`) and the Orval config.
-Run codegen: `pnpm --filter @workspace/api-spec run codegen`
-
-### `lib/api-zod` (`@workspace/api-zod`)
-
-Generated Zod schemas from the OpenAPI spec.
-
-### `lib/api-client-react` (`@workspace/api-client-react`)
-
-Generated React Query hooks and fetch client from the OpenAPI spec.

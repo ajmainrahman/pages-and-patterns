@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Book, Plus, ArrowRight, Library as LibraryIcon, BookOpen, Star, Sparkles, Clock, Target, FileText } from "lucide-react";
-import { useGetStats, useListRecentBooks, useListFavoriteBooks, useListBooks } from "@workspace/api-client-react";
-import { Book as BookType } from "@workspace/api-client-react/src/generated/api.schemas";
+import { useGetStats, useListRecentBooks, useListFavoriteBooks, useListBooks } from "@/lib/hooks";
+import { Book as BookType } from "@/lib/store";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -35,7 +35,6 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
       <Link href={`/books/${book.id}`} className="block group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl">
         <div className="bg-card border border-border/50 hover:border-primary/30 rounded-2xl p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
           <div className="flex gap-4">
-            {/* Mini cover */}
             <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-secondary flex items-center justify-center shadow-sm">
               {book.coverUrl ? (
                 <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
@@ -45,8 +44,6 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
                 </span>
               )}
             </div>
-
-            {/* Info */}
             <div className="flex-1 min-w-0 space-y-2">
               <div>
                 <h3 className={`font-semibold leading-tight line-clamp-1 group-hover:text-primary transition-colors ${book.language === "bengali" ? "font-bengali" : "font-serif"}`}>
@@ -56,8 +53,6 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
                   {book.author}
                 </p>
               </div>
-
-              {/* Progress bar */}
               {pct !== null ? (
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs text-muted-foreground">
@@ -81,8 +76,6 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
                   <div className="h-full w-0 bg-primary rounded-full" />
                 </div>
               )}
-
-              {/* Stats row */}
               <div className="flex flex-wrap gap-3 text-xs">
                 {pagesLeft !== null && (
                   <span className="flex items-center gap-1 text-muted-foreground">
@@ -123,7 +116,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-16">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -145,7 +137,6 @@ export default function Dashboard() {
         </Button>
       </motion.div>
 
-      {/* Stats Row */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -158,14 +149,9 @@ export default function Dashboard() {
         <StatCard title="Avg Rating" value={stats?.averageRating ? stats.averageRating.toFixed(1) : "-"} icon={<Star className="w-5 h-5 text-accent" />} loading={statsLoading} />
       </motion.div>
 
-      {/* Currently Reading */}
       {!readingLoading && currentlyReading.length > 0 && (
         <section>
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-amber-500" />
@@ -182,7 +168,6 @@ export default function Dashboard() {
                 </Link>
               </Button>
             </div>
-
             <div className={`grid gap-4 ${currentlyReading.length === 1 ? "grid-cols-1 max-w-lg" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
               {currentlyReading.map((book, i) => (
                 <ReadingProgressCard key={book.id} book={book} index={i} />
@@ -192,7 +177,6 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* Favorites Highlights */}
       {!favoritesLoading && favoriteBooks && favoriteBooks.length > 0 && (
         <section>
           <div className="flex justify-between items-center mb-6">
@@ -214,7 +198,6 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* Recent Books */}
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl md:text-3xl font-serif font-medium tracking-tight">Recently Added</h2>
@@ -224,7 +207,6 @@ export default function Dashboard() {
             </Link>
           </Button>
         </div>
-
         {recentLoading ? (
           <BookGridSkeleton count={4} />
         ) : recentBooks?.length ? (
@@ -248,7 +230,7 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ title, value, icon, loading }: { title: string, value?: number | string, icon: React.ReactNode, loading: boolean }) {
+function StatCard({ title, value, icon, loading }: { title: string; value?: number | string; icon: React.ReactNode; loading: boolean }) {
   return (
     <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
       <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">

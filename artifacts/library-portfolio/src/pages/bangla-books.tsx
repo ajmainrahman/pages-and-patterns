@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useListBengaliBooks } from "@workspace/api-client-react";
+import { useListBengaliBooks } from "@/lib/hooks";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -12,7 +12,6 @@ export default function BanglaBooks() {
 
   return (
     <div className="space-y-10">
-      {/* Header — Bengali typography showcase */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,7 +20,6 @@ export default function BanglaBooks() {
       >
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            {/* Bengali title */}
             <h1 className="font-bengali text-4xl md:text-5xl font-bold text-foreground mb-2 tracking-wide leading-tight">
               বাংলা বইয়ের তাক
             </h1>
@@ -46,7 +44,6 @@ export default function BanglaBooks() {
         </div>
       </motion.div>
 
-      {/* Decorative divider with Bengali script */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -60,7 +57,6 @@ export default function BanglaBooks() {
         <div className="h-px flex-1 bg-border" />
       </motion.div>
 
-      {/* Book Grid */}
       {isLoading ? (
         <BookGridSkeleton count={6} />
       ) : books && books.length > 0 ? (
@@ -94,7 +90,6 @@ export default function BanglaBooks() {
         </motion.div>
       )}
 
-      {/* Bengali reading tips section */}
       {books && books.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -112,13 +107,13 @@ export default function BanglaBooks() {
             </div>
             <div>
               <p className="font-bengali text-3xl font-bold text-green-700">
-                {books.filter(b => b.status === "read").length}
+                {books.filter((b) => b.status === "read").length}
               </p>
               <p className="font-bengali text-sm text-muted-foreground mt-1">পড়া হয়েছে</p>
             </div>
             <div>
               <p className="font-bengali text-3xl font-bold text-amber-600">
-                {books.filter(b => b.status === "reading").length}
+                {books.filter((b) => b.status === "reading").length}
               </p>
               <p className="font-bengali text-sm text-muted-foreground mt-1">পড়ছি</p>
             </div>

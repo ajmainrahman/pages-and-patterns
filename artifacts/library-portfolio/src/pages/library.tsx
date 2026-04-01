@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useListBooks, useListGenres } from "@workspace/api-client-react";
+import { useListBooks, useListGenres } from "@/lib/hooks";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal } from "lucide-react";
@@ -12,26 +12,24 @@ export default function Library() {
   const [status, setStatus] = useState<string>("all");
 
   const { data: genres } = useListGenres();
-  
-  // Use a debounced search value in a real app, but for simplicity we'll just pass it
-  const { data: books, isLoading } = useListBooks({ 
-    search: search || undefined, 
-    genre: genre !== "all" ? genre : undefined, 
-    status: status !== "all" ? (status as any) : undefined 
+
+  const { data: books, isLoading } = useListBooks({
+    search: search || undefined,
+    genre: genre !== "all" ? genre : undefined,
+    status: status !== "all" ? status : undefined,
   });
 
   return (
     <div className="space-y-8">
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }} 
-        animate={{ opacity: 1, y: 0 }} 
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="flex flex-col md:flex-row md:items-end justify-between gap-6"
       >
         <div>
           <h1 className="text-4xl font-serif mb-2 font-medium tracking-tight">Your Library</h1>
           <p className="text-muted-foreground font-light text-lg">Browse and filter your complete collection.</p>
         </div>
-        
         <div className="text-sm font-medium text-muted-foreground bg-secondary/50 px-4 py-1.5 rounded-full">
           {isLoading ? "Loading..." : `${books?.length || 0} books`}
         </div>
@@ -40,14 +38,13 @@ export default function Library() {
       <div className="bg-card p-4 rounded-2xl border shadow-sm flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/70" />
-          <Input 
-            placeholder="Search by title or author..." 
+          <Input
+            placeholder="Search by title or author..."
             className="pl-11 h-12 bg-background border-border/50 text-base rounded-xl"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
         <div className="flex w-full md:w-auto gap-3">
           <div className="flex items-center gap-2 px-2 md:hidden">
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
@@ -58,7 +55,7 @@ export default function Library() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Genres</SelectItem>
-              {genres?.map(g => (
+              {genres?.map((g) => (
                 <SelectItem key={g} value={g}>{g}</SelectItem>
               ))}
             </SelectContent>
@@ -87,7 +84,7 @@ export default function Library() {
           ))}
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-center py-24 bg-card rounded-2xl border border-dashed border-border shadow-sm"

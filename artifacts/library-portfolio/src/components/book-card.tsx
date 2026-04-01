@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { StarRating } from "./star-rating";
-import { Book } from "@workspace/api-client-react/src/generated/api.schemas";
+import { Book } from "@/lib/store";
 
 export function BookCard({ book, index = 0, bengali = false }: { book: Book, index?: number, bengali?: boolean }) {
   return (
