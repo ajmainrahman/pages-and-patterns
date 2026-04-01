@@ -1,12 +1,22 @@
 import { useRoute, Link, useLocation } from "wouter";
 import { useState } from "react";
-import { useGetBook, useDeleteBook, useUpdateBook } from "@/lib/hooks";
+import {
+  useGetBook,
+  useDeleteBook,
+  useUpdateBook,
+  getGetBookQueryKey,
+  getListBooksQueryKey,
+  getListRecentBooksQueryKey,
+  getListFavoriteBooksQueryKey,
+  getGetStatsQueryKey,
+} from "@workspace/api-client-react";
 import { StatusBadge } from "@/components/status-badge";
 import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil, Home, ShoppingCart, FileText } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, parseISO, isValid } from "date-fns";
 
@@ -168,17 +178,30 @@ export default function BookDetail() {
   const [, params] = useRoute("/books/:id");
   const id = parseInt(params?.id || "0", 10);
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: book, isLoading } = useGetBook(id, { query: { enabled: !!id } });
+  const { data: book, isLoading } = useGetBook(id, {
+    query: { enabled: !!id, queryKey: getGetBookQueryKey(id) },
+  });
+
   const deleteMutation = useDeleteBook();
   const updateMutation = useUpdateBook();
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: getGetBookQueryKey(id) });
+    queryClient.invalidateQueries({ queryKey: getListBooksQueryKey() });
+  };
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to remove "${book?.title}" from your library?`)) {
       deleteMutation.mutate({ id }, {
         onSuccess: () => {
           toast({ title: "Book removed from library" });
+          queryClient.invalidateQueries({ queryKey: getListBooksQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getListRecentBooksQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getListFavoriteBooksQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
           setLocation("/library");
         },
       });
@@ -187,13 +210,13 @@ export default function BookDetail() {
 
   const handleCurrentPageUpdate = (currentPage: number) => {
     updateMutation.mutate({ id, data: { currentPage } }, {
-      onSuccess: () => toast({ title: "Progress updated" }),
+      onSuccess: () => { toast({ title: "Progress updated" }); invalidate(); },
     });
   };
 
   const handleDeadlineUpdate = (readingDeadline: string | null) => {
     updateMutation.mutate({ id, data: { readingDeadline } }, {
-      onSuccess: () => toast({ title: readingDeadline ? "Deadline set" : "Deadline cleared" }),
+      onSuccess: () => { toast({ title: readingDeadline ? "Deadline set" : "Deadline cleared" }); invalidate(); },
     });
   };
 
@@ -206,6 +229,7 @@ export default function BookDetail() {
           <div className="flex-1 space-y-4">
             <div className="h-10 w-3/4 bg-secondary rounded" />
             <div className="h-6 w-1/2 bg-secondary rounded" />
+            <div className="h-24 w-full bg-secondary rounded mt-8" />
           </div>
         </div>
       </div>
@@ -257,21 +281,17 @@ export default function BookDetail() {
 
           <div className="bg-card border rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4 shrink-0" />
-              <span>Published {book.publishedYear || "Unknown"}</span>
+              <Calendar className="w-4 h-4 shrink-0" /><span>Published {book.publishedYear || "Unknown"}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <BookOpen className="w-4 h-4 shrink-0" />
-              <span>{book.pageCount ? `${book.pageCount} pages` : "Unknown pages"}</span>
+              <BookOpen className="w-4 h-4 shrink-0" /><span>{book.pageCount ? `${book.pageCount} pages` : "Unknown pages"}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4 shrink-0" />
-              <span>Added {format(new Date(book.createdAt), "MMM d, yyyy")}</span>
+              <Clock className="w-4 h-4 shrink-0" /><span>Added {format(new Date(book.createdAt), "MMM d, yyyy")}</span>
             </div>
             {book.format && (
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <FileText className="w-4 h-4 shrink-0" />
-                <span>{book.format === "physical" ? "📚 Physical Copy" : "📄 PDF / Digital"}</span>
+                <FileText className="w-4 h-4 shrink-0" /><span>{book.format === "physical" ? "📚 Physical Copy" : "📄 PDF / Digital"}</span>
               </div>
             )}
             {book.isOwned && (

@@ -2,8 +2,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRoute, useLocation } from "wouter";
-import { useGetBook, useUpdateBook } from "@/lib/hooks";
-import { Book } from "@/lib/store";
+import {
+  useGetBook,
+  useUpdateBook,
+  getGetBookQueryKey,
+  getListBooksQueryKey,
+  getListRecentBooksQueryKey,
+  getGetStatsQueryKey,
+  getListBengaliBooksQueryKey,
+} from "@workspace/api-client-react";
+import { Book } from "@workspace/api-client-react/src/generated/api.schemas";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { BookOpen, Sparkles, Target, Pencil, Home, ShoppingCart, FileText } from "lucide-react";
 
@@ -37,6 +46,7 @@ const formSchema = z.object({
 
 function EditBookForm({ book, id }: { book: Book; id: number }) {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const updateBook = useUpdateBook();
 
@@ -76,7 +86,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
       wantToBuy: values.wantToBuy,
       summary: values.summary || null,
       review: values.review || null,
-      rating: values.rating ? values.rating : null,
+      rating: values.rating || null,
       coverUrl: values.coverUrl || null,
       publishedYear: values.publishedYear || null,
       pageCount: values.pageCount || null,
@@ -88,6 +98,11 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
 
     updateBook.mutate({ id, data }, {
       onSuccess: (updated) => {
+        queryClient.invalidateQueries({ queryKey: getGetBookQueryKey(id) });
+        queryClient.invalidateQueries({ queryKey: getListBooksQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListRecentBooksQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListBengaliBooksQueryKey() });
         toast({ title: "Book updated", description: `"${updated.title}" has been saved.` });
         setLocation(`/books/${id}`);
       },
@@ -101,6 +116,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
     <div className="bg-card border shadow-sm rounded-3xl p-6 md:p-10">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
           <div className="space-y-6">
             <h2 className="text-xl font-serif border-b pb-2 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" /> Core Information
@@ -118,7 +134,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
                 <FormItem>
                   <FormLabel>Reading Status *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger className="bg-background"><SelectValue /></SelectTrigger></FormControl>
+                    <FormControl><SelectTrigger className="bg-background"><SelectValue placeholder="Select a status" /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="read">Read</SelectItem>
                       <SelectItem value="reading">Currently Reading</SelectItem>
@@ -132,7 +148,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
                 <FormItem>
                   <FormLabel>Language</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger className="bg-background"><SelectValue /></SelectTrigger></FormControl>
+                    <FormControl><SelectTrigger className="bg-background"><SelectValue placeholder="Select language" /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="english">English</SelectItem>
                       <SelectItem value="bengali" className="font-bengali">বাংলা (Bengali)</SelectItem>
@@ -226,7 +242,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
                 <FormItem><FormLabel>Total Pages</FormLabel><FormControl><Input type="number" className="bg-background" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
               )} />
               <FormField control={form.control} name="currentPage" render={({ field }) => (
-                <FormItem><FormLabel>Current Page</FormLabel><FormControl><Input type="number" min={0} className="bg-background" {...field} value={field.value || ""} /></FormControl><FormDescription>How far you've read</FormDescription><FormMessage /></FormItem>
+                <FormItem><FormLabel>Current Page</FormLabel><FormControl><Input type="number" min={0} className="bg-background" placeholder="e.g. 120" {...field} value={field.value || ""} /></FormControl><FormDescription>How far you've read</FormDescription><FormMessage /></FormItem>
               )} />
             </div>
             <FormField control={form.control} name="readingDeadline" render={({ field }) => (
@@ -254,7 +270,9 @@ export default function EditBook() {
   const id = parseInt(params?.id || "0", 10);
   const [, setLocation] = useLocation();
 
-  const { data: book, isLoading } = useGetBook(id, { query: { enabled: !!id } });
+  const { data: book, isLoading } = useGetBook(id, {
+    query: { enabled: !!id, queryKey: getGetBookQueryKey(id) },
+  });
 
   if (isLoading) {
     return (

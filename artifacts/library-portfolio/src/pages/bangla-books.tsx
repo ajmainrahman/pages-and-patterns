@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useListBengaliBooks } from "@/lib/hooks";
+import { useListBengaliBooks } from "@workspace/api-client-react";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";

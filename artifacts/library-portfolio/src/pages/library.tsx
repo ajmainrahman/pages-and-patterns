@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useListBooks, useListGenres } from "@/lib/hooks";
+import {
+  useListBooks,
+  useListGenres,
+  getListBooksQueryKey,
+} from "@workspace/api-client-react";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal } from "lucide-react";
@@ -13,11 +17,14 @@ export default function Library() {
 
   const { data: genres } = useListGenres();
 
-  const { data: books, isLoading } = useListBooks({
-    search: search || undefined,
-    genre: genre !== "all" ? genre : undefined,
-    status: status !== "all" ? status : undefined,
-  });
+  const { data: books, isLoading } = useListBooks(
+    {
+      search: search || undefined,
+      genre: genre !== "all" ? genre : undefined,
+      status: status !== "all" ? (status as "read" | "reading" | "want_to_read") : undefined,
+    },
+    { query: { queryKey: getListBooksQueryKey({ search, genre, status }) } }
+  );
 
   return (
     <div className="space-y-8">

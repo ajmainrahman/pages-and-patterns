@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { StarRating } from "./star-rating";
-import { Book } from "@/lib/store";
+import { Book } from "@workspace/api-client-react/src/generated/api.schemas";
 
-export function BookCard({ book, index = 0, bengali = false }: { book: Book, index?: number, bengali?: boolean }) {
+export function BookCard({ book, index = 0, bengali = false }: { book: Book; index?: number; bengali?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -18,10 +18,10 @@ export function BookCard({ book, index = 0, bengali = false }: { book: Book, ind
           <CardContent className="p-0 flex flex-col h-full">
             <div className="relative aspect-[2/3] w-full bg-secondary overflow-hidden flex items-center justify-center">
               {book.coverUrl ? (
-                <img 
-                  src={book.coverUrl} 
-                  alt={`Cover of ${book.title}`} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                <img
+                  src={book.coverUrl}
+                  alt={`Cover of ${book.title}`}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
               ) : (
@@ -29,9 +29,7 @@ export function BookCard({ book, index = 0, bengali = false }: { book: Book, ind
                   {book.title.charAt(0).toUpperCase()}
                 </div>
               )}
-              {/* Overlay Gradient for contrast */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
               {book.isFavorite && (
                 <div className="absolute top-3 right-3 bg-background/95 backdrop-blur-md p-2 rounded-full shadow-sm z-10">
                   <svg className="w-4 h-4 text-primary fill-primary" viewBox="0 0 24 24">
@@ -40,18 +38,22 @@ export function BookCard({ book, index = 0, bengali = false }: { book: Book, ind
                 </div>
               )}
             </div>
-            
+
             <div className="p-4 flex flex-col flex-grow bg-card z-10 relative">
               <div className="flex justify-between items-center gap-2 mb-2">
                 <StatusBadge status={book.status} className="text-[10px] px-1.5 py-0" />
                 <StarRating rating={book.rating} />
               </div>
-              <h3 className={`font-bold text-lg leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors ${bengali || book.language === 'bengali' ? 'font-bengali' : 'font-serif'}`}>{book.title}</h3>
-              <p className={`text-sm text-muted-foreground mb-4 line-clamp-1 ${bengali || book.language === 'bengali' ? 'font-bengali' : ''}`}>{book.author}</p>
-              
+              <h3 className={`font-bold text-lg leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors ${bengali || book.language === "bengali" ? "font-bengali" : "font-serif"}`}>
+                {book.title}
+              </h3>
+              <p className={`text-sm text-muted-foreground mb-4 line-clamp-1 ${bengali || book.language === "bengali" ? "font-bengali" : ""}`}>
+                {book.author}
+              </p>
+
               <div className="mt-auto space-y-2">
                 <div className="flex flex-wrap gap-1.5">
-                  {book.genres?.slice(0, 2).map(g => (
+                  {book.genres?.slice(0, 2).map((g) => (
                     <span key={g} className="text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium tracking-wide uppercase">
                       {g}
                     </span>

@@ -1,3 +1,2 @@
-export default (_req: unknown, res: { json: (data: unknown) => void }) => {
-  res.json({ message: "Static site - no API" });
-};
+import app from "../artifacts/api-server/src/app";
+export default app;

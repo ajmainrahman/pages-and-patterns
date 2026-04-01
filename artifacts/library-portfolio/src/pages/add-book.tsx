@@ -1,7 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCreateBook } from "@/lib/hooks";
+import {
+  useCreateBook,
+  getListBooksQueryKey,
+  getListRecentBooksQueryKey,
+  getGetStatsQueryKey,
+} from "@workspace/api-client-react";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { BookOpen, Sparkles, Target, Home, ShoppingCart, FileText } from "lucide-react";
 
@@ -36,6 +42,7 @@ const formSchema = z.object({
 
 export default function AddBook() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const createBook = useCreateBook();
 
@@ -44,8 +51,9 @@ export default function AddBook() {
     defaultValues: {
       title: "", author: "", genres: "", summary: "", review: "",
       rating: 0, status: "want_to_read", language: "english", format: "",
-      isOwned: false, wantToBuy: false, coverUrl: "", publishedYear: 0,
-      pageCount: 0, currentPage: 0, readingDeadline: "", isFavorite: false, quotes: "",
+      isOwned: false, wantToBuy: false, coverUrl: "",
+      publishedYear: 0, pageCount: 0, currentPage: 0,
+      readingDeadline: "", isFavorite: false, quotes: "",
     },
   });
 
@@ -56,12 +64,12 @@ export default function AddBook() {
       genres: values.genres ? values.genres.split(",").map((g) => g.trim()).filter(Boolean) : [],
       status: values.status,
       language: values.language,
-      format: (values.format && values.format !== "none" ? values.format as "pdf" | "physical" : null),
+      format: values.format && values.format !== "none" ? (values.format as "pdf" | "physical") : null,
       isOwned: values.isOwned,
       wantToBuy: values.wantToBuy,
       summary: values.summary || null,
       review: values.review || null,
-      rating: values.rating ? values.rating : null,
+      rating: values.rating || null,
       coverUrl: values.coverUrl || null,
       publishedYear: values.publishedYear || null,
       pageCount: values.pageCount || null,
@@ -73,6 +81,9 @@ export default function AddBook() {
 
     createBook.mutate({ data }, {
       onSuccess: (newBook) => {
+        queryClient.invalidateQueries({ queryKey: getListBooksQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListRecentBooksQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
         toast({ title: "Added to Library", description: `"${newBook.title}" has been cataloged.` });
         setLocation(`/books/${newBook.id}`);
       },
@@ -92,6 +103,7 @@ export default function AddBook() {
       <div className="bg-card border shadow-sm rounded-3xl p-6 md:p-10">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
             <div className="space-y-6">
               <h2 className="text-xl font-serif border-b pb-2 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" /> Core Information
@@ -228,8 +240,8 @@ export default function AddBook() {
               )} />
             </div>
 
-            <div className="pt-6 border-t flex justify-end">
-              <Button type="button" variant="ghost" onClick={() => setLocation("/library")} className="mr-4">Cancel</Button>
+            <div className="pt-6 border-t flex justify-end gap-3">
+              <Button type="button" variant="ghost" onClick={() => setLocation("/library")}>Cancel</Button>
               <Button type="submit" size="lg" className="rounded-full px-8 shadow-md" disabled={createBook.isPending}>
                 {createBook.isPending ? "Adding..." : "Add to Library"}
               </Button>

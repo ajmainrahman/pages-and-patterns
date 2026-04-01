@@ -1,4 +1,4 @@
-import { useGetStats } from "@/lib/hooks";
+import { useGetStats } from "@workspace/api-client-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
   AreaChart, Area, CartesianGrid,
@@ -67,6 +67,10 @@ export default function Stats() {
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
         </div>
         <Skeleton className="h-72 rounded-3xl w-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-72 rounded-3xl" />
+          <Skeleton className="h-72 rounded-3xl" />
+        </div>
       </div>
     );
   }

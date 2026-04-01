@@ -1,7 +1,14 @@
 import { Link } from "wouter";
-import { Book, Plus, ArrowRight, Library as LibraryIcon, BookOpen, Star, Sparkles, Clock, Target, FileText } from "lucide-react";
-import { useGetStats, useListRecentBooks, useListFavoriteBooks, useListBooks } from "@/lib/hooks";
-import { Book as BookType } from "@/lib/store";
+import {
+  Book, Plus, ArrowRight, Library as LibraryIcon, BookOpen, Star, Sparkles, Clock, Target, FileText,
+} from "lucide-react";
+import {
+  useGetStats,
+  useListRecentBooks,
+  useListFavoriteBooks,
+  useListBooks,
+} from "@workspace/api-client-react";
+import { Book as BookType } from "@workspace/api-client-react/src/generated/api.schemas";
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -15,16 +22,15 @@ function daysUntil(dateStr: string): number {
 }
 
 function ReadingProgressCard({ book, index }: { book: BookType; index: number }) {
-  const pct = book.pageCount && book.pageCount > 0 && book.currentPage != null
-    ? Math.min(100, Math.round((book.currentPage / book.pageCount) * 100))
-    : null;
-  const pagesLeft = book.pageCount && book.currentPage != null
-    ? book.pageCount - book.currentPage
-    : null;
+  const pct =
+    book.pageCount && book.pageCount > 0 && book.currentPage != null
+      ? Math.min(100, Math.round((book.currentPage / book.pageCount) * 100))
+      : null;
+  const pagesLeft =
+    book.pageCount && book.currentPage != null ? book.pageCount - book.currentPage : null;
   const days = book.readingDeadline ? daysUntil(book.readingDeadline) : null;
-  const dailyTarget = days != null && days > 0 && pagesLeft != null
-    ? Math.ceil(pagesLeft / days)
-    : null;
+  const dailyTarget =
+    days != null && days > 0 && pagesLeft != null ? Math.ceil(pagesLeft / days) : null;
 
   return (
     <motion.div
@@ -72,29 +78,29 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-2 bg-secondary rounded-full">
-                  <div className="h-full w-0 bg-primary rounded-full" />
-                </div>
+                <div className="w-full h-2 bg-secondary rounded-full" />
               )}
               <div className="flex flex-wrap gap-3 text-xs">
                 {pagesLeft !== null && (
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <BookOpen className="w-3 h-3" />
-                    <span><strong className="text-foreground">{pagesLeft}</strong> pages left</span>
+                    <strong className="text-foreground">{pagesLeft}</strong> pages left
                   </span>
                 )}
                 {days !== null && (
                   <span className={`flex items-center gap-1 ${days < 0 ? "text-red-500" : days <= 3 ? "text-amber-500" : "text-muted-foreground"}`}>
                     <Clock className="w-3 h-3" />
-                    <span>
-                      {days < 0 ? `${Math.abs(days)} days overdue` : days === 0 ? "Due today!" : `${days} days left`}
-                    </span>
+                    {days < 0
+                      ? `${Math.abs(days)} days overdue`
+                      : days === 0
+                      ? "Due today!"
+                      : `${days} days left`}
                   </span>
                 )}
                 {dailyTarget !== null && days !== null && days > 0 && (
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Target className="w-3 h-3" />
-                    <span><strong className="text-foreground">{dailyTarget}</strong> pages/day</span>
+                    <strong className="text-foreground">{dailyTarget}</strong> pages/day
                   </span>
                 )}
               </div>
@@ -163,7 +169,7 @@ export default function Dashboard() {
                 )}
               </div>
               <Button variant="ghost" asChild className="text-muted-foreground hover:text-primary">
-                <Link href="/library?status=reading" className="flex items-center gap-1">
+                <Link href="/library" className="flex items-center gap-1">
                   View all <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
@@ -185,7 +191,7 @@ export default function Dashboard() {
               <h2 className="text-2xl md:text-3xl font-serif font-medium tracking-tight">Favorites</h2>
             </div>
             <Button variant="ghost" asChild className="text-muted-foreground hover:text-primary">
-              <Link href="/library?favorite=true" className="flex items-center gap-1">
+              <Link href="/library" className="flex items-center gap-1">
                 View all <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
@@ -233,9 +239,6 @@ export default function Dashboard() {
 function StatCard({ title, value, icon, loading }: { title: string; value?: number | string; icon: React.ReactNode; loading: boolean }) {
   return (
     <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-      <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
-        {icon}
-      </div>
       <div className="flex justify-between items-start mb-4 relative z-10">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{title}</h3>
         {icon}
