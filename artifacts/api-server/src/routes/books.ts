@@ -106,8 +106,11 @@ router.post("/books", async (req, res): Promise<void> => {
     return;
   }
 
+  const { title, author, ...rest } = parsed.data;
   const data = {
-    ...parsed.data,
+    title: title ?? "",
+    author: author ?? "",
+    ...rest,
     genres: parsed.data.genres ?? [],
     quotes: parsed.data.quotes ?? [],
     status: (parsed.data.status ?? "want_to_read") as "read" | "reading" | "want_to_read",
