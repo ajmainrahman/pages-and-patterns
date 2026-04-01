@@ -1,11 +1,6 @@
 {
   "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
   "installCommand": "pnpm install",
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30
-    }
-  },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index" },
     { "handle": "filesystem" },
