@@ -1,9 +1,15 @@
 {
-  "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
-  "outputDirectory": "public",
+  "version": 2,
   "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter @workspace/library-portfolio run build && pnpm --filter @workspace/api-server run build:vercel",
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
