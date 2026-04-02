@@ -11,6 +11,7 @@ import type { GenreCount } from "./genreCount";
 import type { LangCount } from "./langCount";
 import type { MonthCount } from "./monthCount";
 import type { RatingCount } from "./ratingCount";
+import type { YearCount } from "./yearCount";
 
 export interface LibraryStats {
   totalBooks: number;
@@ -28,4 +29,5 @@ export interface LibraryStats {
   formatBreakdown: FormatCount[];
   pagesReadTotal: number;
   avgPagesPerBook: number;
+  booksPerYear: YearCount[];
 }

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Library as LibraryIcon, BarChart2, Plus, BookHeart, LogOut } from "lucide-react";
+import { Home, Library as LibraryIcon, BarChart2, Plus, NotebookPen, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -9,7 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/library", label: "Library", icon: LibraryIcon },
-    { href: "/bangla", label: "বাংলা বই", icon: BookHeart },
+    { href: "/journal", label: "Journal", icon: NotebookPen },
     { href: "/stats", label: "Stats", icon: BarChart2 },
   ];
 
@@ -60,7 +60,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 <item.icon className={`w-5 h-5 shrink-0 ${isActive ? "text-primary" : "opacity-70"}`} />
-                <span className={item.href === "/bangla" ? "font-bengali" : ""}>{item.label}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
@@ -126,7 +126,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               }`}
             >
               <item.icon className="w-5 h-5" />
-              <span className={`text-[10px] font-medium ${item.href === "/bangla" ? "font-bengali" : ""}`}>{item.label}</span>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
           );
         })}

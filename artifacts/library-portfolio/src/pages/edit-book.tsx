@@ -37,6 +37,7 @@ const formSchema = z.object({
   wantToBuy: z.boolean().default(false),
   coverUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   driveLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  completedAt: z.string().optional(),
   publishedYear: z.coerce.number().optional().or(z.literal(0)),
   pageCount: z.coerce.number().optional().or(z.literal(0)),
   currentPage: z.coerce.number().optional().or(z.literal(0)),
@@ -67,6 +68,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
       wantToBuy: book.wantToBuy,
       coverUrl: book.coverUrl || "",
       driveLink: book.driveLink || "",
+      completedAt: book.completedAt || "",
       publishedYear: book.publishedYear || 0,
       pageCount: book.pageCount || 0,
       currentPage: book.currentPage || 0,
@@ -91,6 +93,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
       rating: values.rating || null,
       coverUrl: values.coverUrl || null,
       driveLink: values.driveLink || null,
+      completedAt: values.completedAt || null,
       publishedYear: values.publishedYear || null,
       pageCount: values.pageCount || null,
       currentPage: values.currentPage || null,
@@ -251,9 +254,14 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
                 <FormItem><FormLabel>Current Page</FormLabel><FormControl><Input type="number" min={0} className="bg-background" placeholder="e.g. 120" {...field} value={field.value || ""} /></FormControl><FormDescription>How far you've read</FormDescription><FormMessage /></FormItem>
               )} />
             </div>
-            <FormField control={form.control} name="readingDeadline" render={({ field }) => (
-              <FormItem className="max-w-xs"><FormLabel className="flex items-center gap-2"><Target className="w-3.5 h-3.5" /> Reading Deadline</FormLabel><FormControl><Input type="date" className="bg-background" {...field} value={field.value || ""} /></FormControl><FormDescription>Target date to finish this book</FormDescription><FormMessage /></FormItem>
-            )} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField control={form.control} name="readingDeadline" render={({ field }) => (
+                <FormItem><FormLabel className="flex items-center gap-2"><Target className="w-3.5 h-3.5" /> Reading Deadline</FormLabel><FormControl><Input type="date" className="bg-background" {...field} value={field.value || ""} /></FormControl><FormDescription>Target date to finish this book</FormDescription><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="completedAt" render={({ field }) => (
+                <FormItem><FormLabel className="flex items-center gap-2">Completion Date</FormLabel><FormControl><Input type="date" className="bg-background" {...field} value={field.value || ""} /></FormControl><FormDescription>When did you actually finish reading it?</FormDescription><FormMessage /></FormItem>
+              )} />
+            </div>
             <FormField control={form.control} name="summary" render={({ field }) => (
               <FormItem><FormLabel>Synopsis</FormLabel><FormControl><Textarea placeholder="Book description..." className="bg-background min-h-[100px]" {...field} /></FormControl><FormMessage /></FormItem>
             )} />

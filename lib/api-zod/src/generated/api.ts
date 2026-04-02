@@ -47,6 +47,10 @@ export const ListBengaliBooksResponseItem = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -102,6 +106,10 @@ export const ListBooksResponseItem = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -144,6 +152,7 @@ export const CreateBookBody = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish(),
   driveLink: zod.string().nullish(),
+  completedAt: zod.string().nullish(),
   isOwned: zod.boolean().default(createBookBodyIsOwnedDefault),
   wantToBuy: zod.boolean().default(createBookBodyWantToBuyDefault),
   isFavorite: zod.boolean().default(createBookBodyIsFavoriteDefault),
@@ -185,6 +194,10 @@ export const GetBookResponse = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -220,6 +233,7 @@ export const UpdateBookBody = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish(),
   driveLink: zod.string().nullish(),
+  completedAt: zod.string().nullish(),
   isOwned: zod.boolean().optional(),
   wantToBuy: zod.boolean().optional(),
   isFavorite: zod.boolean().optional(),
@@ -254,6 +268,10 @@ export const UpdateBookResponse = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -267,6 +285,96 @@ export const UpdateBookResponse = zod.object({
  * @summary Delete a book
  */
 export const DeleteBookParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List all journal entries for the logged-in user
+ */
+export const ListJournalEntriesResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  content: zod.string(),
+  mood: zod.enum(["happy", "reflective", "inspired", "melancholic", "neutral"]),
+  domain: zod.string().nullish(),
+  tags: zod.array(zod.string()),
+  bookId: zod.number().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListJournalEntriesResponse = zod.array(
+  ListJournalEntriesResponseItem,
+);
+
+/**
+ * @summary Create a new journal entry
+ */
+export const createJournalEntryBodyMoodDefault = `neutral`;
+
+export const CreateJournalEntryBody = zod.object({
+  title: zod.string(),
+  content: zod.string().optional(),
+  mood: zod
+    .enum(["happy", "reflective", "inspired", "melancholic", "neutral"])
+    .default(createJournalEntryBodyMoodDefault),
+  domain: zod.string().nullish(),
+  tags: zod.array(zod.string()).optional(),
+  bookId: zod.number().nullish(),
+});
+
+/**
+ * @summary Get a single journal entry
+ */
+export const GetJournalEntryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetJournalEntryResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  content: zod.string(),
+  mood: zod.enum(["happy", "reflective", "inspired", "melancholic", "neutral"]),
+  domain: zod.string().nullish(),
+  tags: zod.array(zod.string()),
+  bookId: zod.number().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Update a journal entry
+ */
+export const UpdateJournalEntryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateJournalEntryBody = zod.object({
+  title: zod.string().optional(),
+  content: zod.string().optional(),
+  mood: zod
+    .enum(["happy", "reflective", "inspired", "melancholic", "neutral"])
+    .optional(),
+  domain: zod.string().nullish(),
+  tags: zod.array(zod.string()).optional(),
+  bookId: zod.number().nullish(),
+});
+
+export const UpdateJournalEntryResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  content: zod.string(),
+  mood: zod.enum(["happy", "reflective", "inspired", "melancholic", "neutral"]),
+  domain: zod.string().nullish(),
+  tags: zod.array(zod.string()),
+  bookId: zod.number().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete a journal entry
+ */
+export const DeleteJournalEntryParams = zod.object({
   id: zod.coerce.number(),
 });
 
@@ -318,6 +426,12 @@ export const GetStatsResponse = zod.object({
   ),
   pagesReadTotal: zod.number(),
   avgPagesPerBook: zod.number(),
+  booksPerYear: zod.array(
+    zod.object({
+      year: zod.number(),
+      count: zod.number(),
+    }),
+  ),
 });
 
 /**
@@ -362,6 +476,10 @@ export const ListRecentBooksResponseItem = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -404,6 +522,10 @@ export const ListFavoriteBooksResponseItem = zod.object({
     .describe(
       "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
     ),
+  completedAt: zod
+    .string()
+    .nullish()
+    .describe("Date the book was actually completed (YYYY-MM-DD)"),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()

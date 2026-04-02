@@ -36,6 +36,8 @@ export interface UpdateBookBody {
   format?: UpdateBookBodyFormat;
   /** @nullable */
   driveLink?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
   isOwned?: boolean;
   wantToBuy?: boolean;
   isFavorite?: boolean;

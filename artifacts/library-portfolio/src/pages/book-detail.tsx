@@ -307,6 +307,12 @@ export default function BookDetail() {
                 </a>
               </div>
             )}
+            {book.completedAt && (
+              <div className="flex items-center gap-3 text-sm text-emerald-700 font-medium">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Completed {new Date(book.completedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+              </div>
+            )}
             {book.isOwned && (
               <div className="flex items-center gap-3 text-sm text-emerald-600 font-medium">
                 <Home className="w-4 h-4 shrink-0" /><span>In my home</span>

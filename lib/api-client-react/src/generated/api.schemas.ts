@@ -86,6 +86,11 @@ export interface Book {
    * @nullable
    */
   driveLink?: string | null;
+  /**
+   * Date the book was actually completed (YYYY-MM-DD)
+   * @nullable
+   */
+  completedAt?: string | null;
   /** Whether the physical book is at home */
   isOwned: boolean;
   /** Whether the user wants to purchase this book */
@@ -151,6 +156,8 @@ export interface CreateBookBody {
   format?: CreateBookBodyFormat;
   /** @nullable */
   driveLink?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
   isOwned?: boolean;
   wantToBuy?: boolean;
   isFavorite?: boolean;
@@ -212,6 +219,8 @@ export interface UpdateBookBody {
   format?: UpdateBookBodyFormat;
   /** @nullable */
   driveLink?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
   isOwned?: boolean;
   wantToBuy?: boolean;
   isFavorite?: boolean;
@@ -247,6 +256,11 @@ export interface FormatCount {
   count: number;
 }
 
+export interface YearCount {
+  year: number;
+  count: number;
+}
+
 export interface LibraryStats {
   totalBooks: number;
   booksRead: number;
@@ -263,6 +277,76 @@ export interface LibraryStats {
   formatBreakdown: FormatCount[];
   pagesReadTotal: number;
   avgPagesPerBook: number;
+  booksPerYear: YearCount[];
+}
+
+export type JournalEntryMood =
+  (typeof JournalEntryMood)[keyof typeof JournalEntryMood];
+
+export const JournalEntryMood = {
+  happy: "happy",
+  reflective: "reflective",
+  inspired: "inspired",
+  melancholic: "melancholic",
+  neutral: "neutral",
+} as const;
+
+export interface JournalEntry {
+  id: number;
+  title: string;
+  content: string;
+  mood: JournalEntryMood;
+  /** @nullable */
+  domain?: string | null;
+  tags: string[];
+  /** @nullable */
+  bookId?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CreateJournalEntryBodyMood =
+  (typeof CreateJournalEntryBodyMood)[keyof typeof CreateJournalEntryBodyMood];
+
+export const CreateJournalEntryBodyMood = {
+  happy: "happy",
+  reflective: "reflective",
+  inspired: "inspired",
+  melancholic: "melancholic",
+  neutral: "neutral",
+} as const;
+
+export interface CreateJournalEntryBody {
+  title: string;
+  content?: string;
+  mood?: CreateJournalEntryBodyMood;
+  /** @nullable */
+  domain?: string | null;
+  tags?: string[];
+  /** @nullable */
+  bookId?: number | null;
+}
+
+export type UpdateJournalEntryBodyMood =
+  (typeof UpdateJournalEntryBodyMood)[keyof typeof UpdateJournalEntryBodyMood];
+
+export const UpdateJournalEntryBodyMood = {
+  happy: "happy",
+  reflective: "reflective",
+  inspired: "inspired",
+  melancholic: "melancholic",
+  neutral: "neutral",
+} as const;
+
+export interface UpdateJournalEntryBody {
+  title?: string;
+  content?: string;
+  mood?: UpdateJournalEntryBodyMood;
+  /** @nullable */
+  domain?: string | null;
+  tags?: string[];
+  /** @nullable */
+  bookId?: number | null;
 }
 
 export type ListBooksParams = {

@@ -12,6 +12,7 @@ import { Book as BookType } from "@workspace/api-client-react/src/generated/api.
 import { BookCard, BookGridSkeleton } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/use-auth";
 
 function daysUntil(dateStr: string): number {
   const today = new Date();
@@ -113,12 +114,14 @@ function ReadingProgressCard({ book, index }: { book: BookType; index: number })
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { data: stats, isLoading: statsLoading } = useGetStats();
   const { data: recentBooks, isLoading: recentLoading } = useListRecentBooks({ limit: 4 });
   const { data: favoriteBooks, isLoading: favoritesLoading } = useListFavoriteBooks();
   const { data: readingBooks, isLoading: readingLoading } = useListBooks({ status: "reading" });
 
   const currentlyReading = readingBooks?.slice(0, 3) ?? [];
+  const displayName = user?.name || user?.email?.split("@")[0] || "Reader";
 
   return (
     <div className="space-y-16">
@@ -130,7 +133,7 @@ export default function Dashboard() {
       >
         <div>
           <h1 className="text-4xl md:text-5xl font-serif text-foreground mb-3 font-medium tracking-tight">
-            Welcome to your library.
+            Welcome to {displayName}'s library.
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground font-light max-w-2xl">
             A quiet space for your reading life. Curate your collection, record your thoughts, and track your journey.

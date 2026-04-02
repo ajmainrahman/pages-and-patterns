@@ -13,6 +13,8 @@ tags:
     description: Book management
   - name: stats
     description: Library statistics
+  - name: journal
+    description: Personal journal entries
 paths:
   /healthz:
     get:
@@ -177,6 +179,111 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /journal:
+    get:
+      operationId: listJournalEntries
+      tags: [journal]
+      summary: List all journal entries for the logged-in user
+      responses:
+        "200":
+          description: Journal entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JournalEntry"
+    post:
+      operationId: createJournalEntry
+      tags: [journal]
+      summary: Create a new journal entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJournalEntryBody"
+      responses:
+        "201":
+          description: Created entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntry"
+
+  /journal/{id}:
+    get:
+      operationId: getJournalEntry
+      tags: [journal]
+      summary: Get a single journal entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Journal entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntry"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateJournalEntry
+      tags: [journal]
+      summary: Update a journal entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateJournalEntryBody"
+      responses:
+        "200":
+          description: Updated entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntry"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteJournalEntry
+      tags: [journal]
+      summary: Delete a journal entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /stats:
     get:
       operationId: getStats
@@ -309,6 +416,9 @@ components:
         driveLink:
           type: ["string", "null"]
           description: Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)
+        completedAt:
+          type: ["string", "null"]
+          description: Date the book was actually completed (YYYY-MM-DD)
         isOwned:
           type: boolean
           description: Whether the physical book is at home
@@ -381,6 +491,8 @@ components:
           enum: [pdf, physical, null]
         driveLink:
           type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
         isOwned:
           type: boolean
           default: false
@@ -436,6 +548,8 @@ components:
           enum: [pdf, physical, null]
         driveLink:
           type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
         isOwned:
           type: boolean
         wantToBuy:
@@ -486,6 +600,10 @@ components:
           type: integer
         avgPagesPerBook:
           type: integer
+        booksPerYear:
+          type: array
+          items:
+            $ref: "#/components/schemas/YearCount"
       required:
         - totalBooks
         - booksRead
@@ -500,6 +618,7 @@ components:
         - formatBreakdown
         - pagesReadTotal
         - avgPagesPerBook
+        - booksPerYear
 
     GenreCount:
       type: object
@@ -566,3 +685,90 @@ components:
       required:
         - format
         - count
+
+    YearCount:
+      type: object
+      properties:
+        year:
+          type: integer
+        count:
+          type: integer
+      required:
+        - year
+        - count
+
+    JournalEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        mood:
+          type: string
+          enum: [happy, reflective, inspired, melancholic, neutral]
+        domain:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        bookId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - mood
+        - tags
+        - createdAt
+        - updatedAt
+
+    CreateJournalEntryBody:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        mood:
+          type: string
+          enum: [happy, reflective, inspired, melancholic, neutral]
+          default: neutral
+        domain:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        bookId:
+          type: ["integer", "null"]
+      required:
+        - title
+
+    UpdateJournalEntryBody:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        mood:
+          type: string
+          enum: [happy, reflective, inspired, melancholic, neutral]
+        domain:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items:
+            type: string
+        bookId:
+          type: ["integer", "null"]

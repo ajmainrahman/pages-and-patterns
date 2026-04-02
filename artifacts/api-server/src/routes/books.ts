@@ -255,11 +255,21 @@ router.get("/stats", async (req, res): Promise<void> => {
     .map(([format, count]) => ({ format, count }))
     .filter((f) => f.count > 0);
 
+  const yearMap = new Map<number, number>();
+  allBooks.filter((b) => b.status === "read").forEach((b) => {
+    const dateStr = b.completedAt || b.createdAt.toISOString().slice(0, 10);
+    const year = new Date(dateStr).getFullYear();
+    if (!isNaN(year)) yearMap.set(year, (yearMap.get(year) ?? 0) + 1);
+  });
+  const booksPerYear = Array.from(yearMap.entries())
+    .map(([year, count]) => ({ year, count }))
+    .sort((a, b) => a.year - b.year);
+
   res.json(
     GetStatsResponse.parse({
       totalBooks, booksRead, booksReading, booksWantToRead, averageRating,
       totalPages, genreBreakdown, topAuthors, booksPerMonth, ratingDistribution,
-      languageBreakdown, formatBreakdown, pagesReadTotal, avgPagesPerBook,
+      languageBreakdown, formatBreakdown, pagesReadTotal, avgPagesPerBook, booksPerYear,
     })
   );
 });

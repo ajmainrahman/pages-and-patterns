@@ -187,6 +187,22 @@ export default function Stats() {
         </ChartCard>
       </div>
 
+      {stats.booksPerYear && stats.booksPerYear.length > 0 && (
+        <ChartCard title="Books Read per Year" icon={<TrendingUp className="w-4 h-4 text-green-600" />} delay={0.52}>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.booksPerYear} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="year" tick={{ fontSize: 12, fill: MUTED }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
+                <RechartsTooltip cursor={{ fill: "hsl(var(--secondary))" }} contentStyle={tooltipStyle} formatter={(v) => [`${v} book${v === 1 ? "" : "s"}`, "Read"]} />
+                <Bar dataKey="count" fill={GREEN} radius={[6, 6, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </ChartCard>
+      )}
+
       <ChartCard title="Most Read Authors" icon={<Trophy className="w-4 h-4 text-amber-500" />} delay={0.55}>
         {stats.topAuthors.length > 0 ? (
           <div className="space-y-3">

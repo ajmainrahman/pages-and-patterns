@@ -53,6 +53,11 @@ export interface Book {
    * @nullable
    */
   driveLink?: string | null;
+  /**
+   * Date the book was actually completed (YYYY-MM-DD)
+   * @nullable
+   */
+  completedAt?: string | null;
   /** Whether the physical book is at home */
   isOwned: boolean;
   /** Whether the user wants to purchase this book */

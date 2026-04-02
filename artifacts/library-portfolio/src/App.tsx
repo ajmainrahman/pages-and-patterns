@@ -10,7 +10,7 @@ import BookDetail from "@/pages/book-detail";
 import AddBook from "@/pages/add-book";
 import EditBook from "@/pages/edit-book";
 import Stats from "@/pages/stats";
-import BanglaBooks from "@/pages/bangla-books";
+import Journal from "@/pages/journal";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import { Layout } from "@/components/layout";
@@ -39,7 +39,7 @@ function Router() {
       <Route path="/books/:id" component={() => <ProtectedRoute component={BookDetail} />} />
       <Route path="/add" component={() => <ProtectedRoute component={AddBook} />} />
       <Route path="/stats" component={() => <ProtectedRoute component={Stats} />} />
-      <Route path="/bangla" component={() => <ProtectedRoute component={BanglaBooks} />} />
+      <Route path="/journal" component={() => <ProtectedRoute component={Journal} />} />
       <Route component={NotFound} />
     </Switch>
   );
