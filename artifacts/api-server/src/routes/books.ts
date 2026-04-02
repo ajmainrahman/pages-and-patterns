@@ -18,7 +18,6 @@ import {
   ListFavoriteBooksResponse,
   ListBengaliBooksResponse,
 } from "@workspace/api-zod";
-import { adminMiddleware } from "../middleware/auth";
 
 const router: IRouter = Router();
 
@@ -263,15 +262,6 @@ router.get("/stats", async (req, res): Promise<void> => {
       languageBreakdown, formatBreakdown, pagesReadTotal, avgPagesPerBook,
     })
   );
-});
-
-router.get("/admin/books", adminMiddleware, async (req, res): Promise<void> => {
-  const targetUserId = req.query.userId ? parseInt(req.query.userId as string, 10) : null;
-  const where = targetUserId ? eq(booksTable.userId, targetUserId) : undefined;
-  const books = where
-    ? await db.select().from(booksTable).where(where).orderBy(desc(booksTable.createdAt))
-    : await db.select().from(booksTable).orderBy(desc(booksTable.createdAt));
-  res.json(ListBooksResponse.parse(books));
 });
 
 export default router;

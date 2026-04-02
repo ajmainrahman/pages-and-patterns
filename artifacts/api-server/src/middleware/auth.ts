@@ -6,7 +6,6 @@ const SECRET = process.env.SESSION_SECRET ?? "dev-secret-change-me";
 export interface AuthPayload {
   userId: number;
   email: string;
-  isAdmin: boolean;
 }
 
 declare global {
@@ -32,12 +31,4 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   } catch {
     res.status(401).json({ error: "Invalid or expired session. Please log in again." });
   }
-}
-
-export function adminMiddleware(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user?.isAdmin) {
-    res.status(403).json({ error: "Admin access required" });
-    return;
-  }
-  next();
 }

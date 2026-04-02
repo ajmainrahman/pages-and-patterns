@@ -13,7 +13,6 @@ import Stats from "@/pages/stats";
 import BanglaBooks from "@/pages/bangla-books";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import Admin from "@/pages/admin";
 import { Layout } from "@/components/layout";
 
 const queryClient = new QueryClient();
@@ -41,7 +40,6 @@ function Router() {
       <Route path="/add" component={() => <ProtectedRoute component={AddBook} />} />
       <Route path="/stats" component={() => <ProtectedRoute component={Stats} />} />
       <Route path="/bangla" component={() => <ProtectedRoute component={BanglaBooks} />} />
-      <Route path="/admin" component={() => <ProtectedRoute component={Admin} />} />
       <Route component={NotFound} />
     </Switch>
   );

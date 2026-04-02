@@ -56,7 +56,7 @@ export default function Register() {
         <div className="bg-card border shadow-sm rounded-3xl p-8">
           <h2 className="text-xl font-serif font-medium mb-1">Create your account</h2>
           <p className="text-sm text-muted-foreground mb-6">
-            This is a one-time setup — only one account can be created.
+            Up to 5 users can join this library. Each person gets their own private collection.
           </p>
 
           {error && (
