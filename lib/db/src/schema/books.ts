@@ -21,6 +21,7 @@ export const booksTable = pgTable("books", {
   currentPage: integer("current_page"),
   readingDeadline: text("reading_deadline"),
   format: text("format", { enum: ["pdf", "physical"] }),
+  driveLink: text("drive_link"),
   isOwned: boolean("is_owned").notNull().default(false),
   wantToBuy: boolean("want_to_buy").notNull().default(false),
   isFavorite: boolean("is_favorite").notNull().default(false),

@@ -14,7 +14,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil, Home, ShoppingCart, FileText } from "lucide-react";
+import { ArrowLeft, Trash2, Calendar, BookOpen, Clock, Heart, Quote, Target, Flag, CheckCircle2, Pencil, Home, ShoppingCart, FileText, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -292,6 +292,19 @@ export default function BookDetail() {
             {book.format && (
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <FileText className="w-4 h-4 shrink-0" /><span>{book.format === "physical" ? "📚 Physical Copy" : "📄 PDF / Digital"}</span>
+              </div>
+            )}
+            {book.driveLink && (
+              <div className="flex items-center gap-3 text-sm">
+                <a
+                  href={book.driveLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-primary hover:underline font-medium"
+                >
+                  <ExternalLink className="w-4 h-4 shrink-0" />
+                  Open in Drive / Cloud
+                </a>
               </div>
             )}
             {book.isOwned && (

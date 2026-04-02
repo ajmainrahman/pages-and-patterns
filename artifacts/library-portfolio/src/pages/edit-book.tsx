@@ -36,6 +36,7 @@ const formSchema = z.object({
   isOwned: z.boolean().default(false),
   wantToBuy: z.boolean().default(false),
   coverUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  driveLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   publishedYear: z.coerce.number().optional().or(z.literal(0)),
   pageCount: z.coerce.number().optional().or(z.literal(0)),
   currentPage: z.coerce.number().optional().or(z.literal(0)),
@@ -65,6 +66,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
       isOwned: book.isOwned,
       wantToBuy: book.wantToBuy,
       coverUrl: book.coverUrl || "",
+      driveLink: book.driveLink || "",
       publishedYear: book.publishedYear || 0,
       pageCount: book.pageCount || 0,
       currentPage: book.currentPage || 0,
@@ -88,6 +90,7 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
       review: values.review || null,
       rating: values.rating || null,
       coverUrl: values.coverUrl || null,
+      driveLink: values.driveLink || null,
       publishedYear: values.publishedYear || null,
       pageCount: values.pageCount || null,
       currentPage: values.currentPage || null,
@@ -163,6 +166,9 @@ function EditBookForm({ book, id }: { book: Book; id: number }) {
             </div>
             <FormField control={form.control} name="coverUrl" render={({ field }) => (
               <FormItem><FormLabel>Cover Image URL</FormLabel><FormControl><Input placeholder="https://..." className="bg-background" {...field} /></FormControl><FormDescription>A direct link to an image of the book cover</FormDescription><FormMessage /></FormItem>
+            )} />
+            <FormField control={form.control} name="driveLink" render={({ field }) => (
+              <FormItem><FormLabel>Drive / Cloud Link</FormLabel><FormControl><Input placeholder="https://drive.google.com/..." className="bg-background" {...field} /></FormControl><FormDescription>Link to the book file on Google Drive, Dropbox, or any cloud storage</FormDescription><FormMessage /></FormItem>
             )} />
           </div>
 

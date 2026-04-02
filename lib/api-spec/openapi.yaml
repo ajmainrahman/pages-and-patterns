@@ -306,6 +306,9 @@ components:
           type: ["string", "null"]
           enum: [pdf, physical, null]
           description: How the book was read (pdf or physical copy)
+        driveLink:
+          type: ["string", "null"]
+          description: Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)
         isOwned:
           type: boolean
           description: Whether the physical book is at home
@@ -376,6 +379,8 @@ components:
         format:
           type: ["string", "null"]
           enum: [pdf, physical, null]
+        driveLink:
+          type: ["string", "null"]
         isOwned:
           type: boolean
           default: false
@@ -429,6 +434,8 @@ components:
         format:
           type: ["string", "null"]
           enum: [pdf, physical, null]
+        driveLink:
+          type: ["string", "null"]
         isOwned:
           type: boolean
         wantToBuy:

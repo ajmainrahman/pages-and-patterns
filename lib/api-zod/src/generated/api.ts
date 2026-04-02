@@ -41,6 +41,12 @@ export const ListBengaliBooksResponseItem = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -90,6 +96,12 @@ export const ListBooksResponseItem = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -131,6 +143,7 @@ export const CreateBookBody = zod.object({
   format: zod
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish(),
+  driveLink: zod.string().nullish(),
   isOwned: zod.boolean().default(createBookBodyIsOwnedDefault),
   wantToBuy: zod.boolean().default(createBookBodyWantToBuyDefault),
   isFavorite: zod.boolean().default(createBookBodyIsFavoriteDefault),
@@ -166,6 +179,12 @@ export const GetBookResponse = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -200,6 +219,7 @@ export const UpdateBookBody = zod.object({
   format: zod
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish(),
+  driveLink: zod.string().nullish(),
   isOwned: zod.boolean().optional(),
   wantToBuy: zod.boolean().optional(),
   isFavorite: zod.boolean().optional(),
@@ -228,6 +248,12 @@ export const UpdateBookResponse = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -330,6 +356,12 @@ export const ListRecentBooksResponseItem = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()
@@ -366,6 +398,12 @@ export const ListFavoriteBooksResponseItem = zod.object({
     .union([zod.literal("pdf"), zod.literal("physical"), zod.literal(null)])
     .nullish()
     .describe("How the book was read (pdf or physical copy)"),
+  driveLink: zod
+    .string()
+    .nullish()
+    .describe(
+      "Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)",
+    ),
   isOwned: zod.boolean().describe("Whether the physical book is at home"),
   wantToBuy: zod
     .boolean()

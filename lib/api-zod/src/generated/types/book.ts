@@ -48,6 +48,11 @@ export interface Book {
    * @nullable
    */
   format?: BookFormat;
+  /**
+   * Link to cloud storage where the book file is stored (Google Drive, Dropbox, etc)
+   * @nullable
+   */
+  driveLink?: string | null;
   /** Whether the physical book is at home */
   isOwned: boolean;
   /** Whether the user wants to purchase this book */

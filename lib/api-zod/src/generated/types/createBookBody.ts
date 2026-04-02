@@ -34,6 +34,8 @@ export interface CreateBookBody {
   readingDeadline?: string | null;
   /** @nullable */
   format?: CreateBookBodyFormat;
+  /** @nullable */
+  driveLink?: string | null;
   isOwned?: boolean;
   wantToBuy?: boolean;
   isFavorite?: boolean;
