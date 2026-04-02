@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Library as LibraryIcon, BarChart2, Plus, BookHeart, LogOut } from "lucide-react";
+import { Home, Library as LibraryIcon, BarChart2, Plus, BookHeart, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -11,6 +11,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/library", label: "Library", icon: LibraryIcon },
     { href: "/bangla", label: "বাংলা বই", icon: BookHeart },
     { href: "/stats", label: "Stats", icon: BarChart2 },
+    ...(user?.isAdmin ? [{ href: "/admin", label: "Admin", icon: Shield }] : []),
   ];
 
   return (

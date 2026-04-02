@@ -4,6 +4,7 @@ export interface AuthUser {
   id: number;
   email: string;
   name: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -57,10 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     setUser(null);
   };
 
