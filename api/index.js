@@ -43929,6 +43929,17 @@ __export(schema_exports, {
   usersTable: () => usersTable
 });
 
+// ../../lib/db/src/schema/users.ts
+var usersTable = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull().default(""),
+  passwordHash: text("password_hash").notNull(),
+  isAdmin: boolean("is_admin").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow()
+});
+
 // ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
 var external_exports = {};
 __export(external_exports, {
@@ -55318,6 +55329,7 @@ var createInsertSchema = (entity, refine2) => {
 // ../../lib/db/src/schema/books.ts
 var booksTable = pgTable("books", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   author: text("author").notNull(),
   genres: text("genres").array().notNull().default([]),
@@ -55340,16 +55352,6 @@ var booksTable = pgTable("books", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => /* @__PURE__ */ new Date())
 });
 var insertBookSchema = createInsertSchema(booksTable).omit({ id: true, createdAt: true, updatedAt: true });
-
-// ../../lib/db/src/schema/users.ts
-var usersTable = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  name: text("name").notNull().default(""),
-  passwordHash: text("password_hash").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow()
-});
 
 // ../../lib/db/src/index.ts
 var { Pool: Pool3 } = esm_default;
@@ -57117,6 +57119,7 @@ var bcryptjs_default = {
 var import_jsonwebtoken = __toESM(require_jsonwebtoken(), 1);
 var router2 = (0, import_express2.Router)();
 var SECRET = process.env.SESSION_SECRET ?? "dev-secret-change-me";
+var MAX_USERS = 5;
 var COOKIE_OPTS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
@@ -57124,6 +57127,9 @@ var COOKIE_OPTS = {
   maxAge: 7 * 24 * 60 * 60 * 1e3,
   path: "/"
 };
+function makeToken(user) {
+  return import_jsonwebtoken.default.sign({ userId: user.id, email: user.email }, SECRET, { expiresIn: "7d" });
+}
 router2.get("/auth/me", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) {
@@ -57158,14 +57164,14 @@ router2.post("/auth/login", async (req, res) => {
     res.status(401).json({ error: "Invalid email or password" });
     return;
   }
-  const token = import_jsonwebtoken.default.sign({ userId: user.id, email: user.email }, SECRET, { expiresIn: "7d" });
+  const token = makeToken(user);
   res.cookie("token", token, COOKIE_OPTS);
   res.json({ id: user.id, email: user.email, name: user.name });
 });
 router2.post("/auth/register", async (req, res) => {
-  const existing = await db.select({ id: usersTable.id }).from(usersTable).limit(1);
-  if (existing.length > 0) {
-    res.status(403).json({ error: "An account already exists. This app is for personal use only." });
+  const existing = await db.select({ id: usersTable.id }).from(usersTable);
+  if (existing.length >= MAX_USERS) {
+    res.status(403).json({ error: `This library is full (max ${MAX_USERS} users).` });
     return;
   }
   const { email: email3, password, name } = req.body ?? {};
@@ -57177,9 +57183,14 @@ router2.post("/auth/register", async (req, res) => {
     res.status(400).json({ error: "Password must be at least 8 characters" });
     return;
   }
+  const existingEmail = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.email, email3));
+  if (existingEmail.length > 0) {
+    res.status(400).json({ error: "An account with this email already exists" });
+    return;
+  }
   const passwordHash = await bcryptjs_default.hash(password, 12);
   const [user] = await db.insert(usersTable).values({ email: email3, passwordHash, name: name ?? "" }).returning();
-  const token = import_jsonwebtoken.default.sign({ userId: user.id, email: user.email }, SECRET, { expiresIn: "7d" });
+  const token = makeToken(user);
   res.cookie("token", token, COOKIE_OPTS);
   res.status(201).json({ id: user.id, email: user.email, name: user.name });
 });
@@ -57192,30 +57203,37 @@ var auth_default = router2;
 // src/routes/books.ts
 var import_express3 = __toESM(require_express2(), 1);
 var router3 = (0, import_express3.Router)();
-router3.get("/books/bengali", async (_req, res) => {
-  const books = await db.select().from(booksTable).where(eq(booksTable.language, "bengali")).orderBy(desc(booksTable.createdAt));
+function getUserId(req) {
+  return req.user.userId;
+}
+router3.get("/books/bengali", async (req, res) => {
+  const userId = getUserId(req);
+  const books = await db.select().from(booksTable).where(and(eq(booksTable.userId, userId), eq(booksTable.language, "bengali"))).orderBy(desc(booksTable.createdAt));
   res.json(ListBengaliBooksResponse.parse(books));
 });
-router3.get("/books/genres", async (_req, res) => {
-  const rows = await db.select({ genres: booksTable.genres }).from(booksTable);
+router3.get("/books/genres", async (req, res) => {
+  const userId = getUserId(req);
+  const rows = await db.select({ genres: booksTable.genres }).from(booksTable).where(eq(booksTable.userId, userId));
   const genreSet = /* @__PURE__ */ new Set();
   rows.forEach((r) => r.genres.forEach((g) => genreSet.add(g)));
-  const genres = Array.from(genreSet).sort();
-  res.json(ListGenresResponse.parse(genres));
+  res.json(ListGenresResponse.parse(Array.from(genreSet).sort()));
 });
 router3.get("/books/recent", async (req, res) => {
+  const userId = getUserId(req);
   const params = ListRecentBooksQueryParams.safeParse(req.query);
   const limit = params.success && params.data.limit ? params.data.limit : 5;
-  const books = await db.select().from(booksTable).orderBy(desc(booksTable.createdAt)).limit(limit);
+  const books = await db.select().from(booksTable).where(eq(booksTable.userId, userId)).orderBy(desc(booksTable.createdAt)).limit(limit);
   res.json(ListRecentBooksResponse.parse(books));
 });
-router3.get("/books/favorites", async (_req, res) => {
-  const books = await db.select().from(booksTable).where(eq(booksTable.isFavorite, true)).orderBy(desc(booksTable.createdAt));
+router3.get("/books/favorites", async (req, res) => {
+  const userId = getUserId(req);
+  const books = await db.select().from(booksTable).where(and(eq(booksTable.userId, userId), eq(booksTable.isFavorite, true))).orderBy(desc(booksTable.createdAt));
   res.json(ListFavoriteBooksResponse.parse(books));
 });
 router3.get("/books", async (req, res) => {
+  const userId = getUserId(req);
   const params = ListBooksQueryParams.safeParse(req.query);
-  const allBooks = await db.select().from(booksTable).orderBy(desc(booksTable.createdAt));
+  const allBooks = await db.select().from(booksTable).where(eq(booksTable.userId, userId)).orderBy(desc(booksTable.createdAt));
   let filtered = allBooks;
   if (params.success) {
     if (params.data.search) {
@@ -57224,19 +57242,16 @@ router3.get("/books", async (req, res) => {
         (b) => b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search)
       );
     }
-    if (params.data.status) {
-      filtered = filtered.filter((b) => b.status === params.data.status);
-    }
+    if (params.data.status) filtered = filtered.filter((b) => b.status === params.data.status);
     if (params.data.genre) {
       const genre = params.data.genre.toLowerCase();
-      filtered = filtered.filter(
-        (b) => b.genres.some((g) => g.toLowerCase() === genre)
-      );
+      filtered = filtered.filter((b) => b.genres.some((g) => g.toLowerCase() === genre));
     }
   }
   res.json(ListBooksResponse.parse(filtered));
 });
 router3.post("/books", async (req, res) => {
+  const userId = getUserId(req);
   const parsed = CreateBookBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -57244,6 +57259,7 @@ router3.post("/books", async (req, res) => {
   }
   const { title, author, ...rest } = parsed.data;
   const data = {
+    userId,
     title: title ?? "",
     author: author ?? "",
     ...rest,
@@ -57256,12 +57272,13 @@ router3.post("/books", async (req, res) => {
   res.status(201).json(GetBookResponse.parse(book));
 });
 router3.get("/books/:id", async (req, res) => {
+  const userId = getUserId(req);
   const params = GetBookParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
-  const [book] = await db.select().from(booksTable).where(eq(booksTable.id, params.data.id));
+  const [book] = await db.select().from(booksTable).where(and(eq(booksTable.id, params.data.id), eq(booksTable.userId, userId)));
   if (!book) {
     res.status(404).json({ error: "Book not found" });
     return;
@@ -57269,6 +57286,7 @@ router3.get("/books/:id", async (req, res) => {
   res.json(GetBookResponse.parse(book));
 });
 router3.patch("/books/:id", async (req, res) => {
+  const userId = getUserId(req);
   const params = UpdateBookParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -57279,7 +57297,7 @@ router3.patch("/books/:id", async (req, res) => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [book] = await db.update(booksTable).set(parsed.data).where(eq(booksTable.id, params.data.id)).returning();
+  const [book] = await db.update(booksTable).set(parsed.data).where(and(eq(booksTable.id, params.data.id), eq(booksTable.userId, userId))).returning();
   if (!book) {
     res.status(404).json({ error: "Book not found" });
     return;
@@ -57287,20 +57305,22 @@ router3.patch("/books/:id", async (req, res) => {
   res.json(UpdateBookResponse.parse(book));
 });
 router3.delete("/books/:id", async (req, res) => {
+  const userId = getUserId(req);
   const params = DeleteBookParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
-  const [book] = await db.delete(booksTable).where(eq(booksTable.id, params.data.id)).returning();
+  const [book] = await db.delete(booksTable).where(and(eq(booksTable.id, params.data.id), eq(booksTable.userId, userId))).returning();
   if (!book) {
     res.status(404).json({ error: "Book not found" });
     return;
   }
   res.sendStatus(204);
 });
-router3.get("/stats", async (_req, res) => {
-  const allBooks = await db.select().from(booksTable);
+router3.get("/stats", async (req, res) => {
+  const userId = getUserId(req);
+  const allBooks = await db.select().from(booksTable).where(eq(booksTable.userId, userId));
   const totalBooks = allBooks.length;
   const booksRead = allBooks.filter((b) => b.status === "read").length;
   const booksReading = allBooks.filter((b) => b.status === "reading").length;
@@ -57312,16 +57332,10 @@ router3.get("/stats", async (_req, res) => {
   const booksWithPages = allBooks.filter((b) => b.pageCount != null && b.pageCount > 0);
   const avgPagesPerBook = booksWithPages.length > 0 ? Math.round(booksWithPages.reduce((sum, b) => sum + (b.pageCount ?? 0), 0) / booksWithPages.length) : 0;
   const genreMap = /* @__PURE__ */ new Map();
-  allBooks.forEach((b) => {
-    b.genres.forEach((g) => {
-      genreMap.set(g, (genreMap.get(g) ?? 0) + 1);
-    });
-  });
+  allBooks.forEach((b) => b.genres.forEach((g) => genreMap.set(g, (genreMap.get(g) ?? 0) + 1)));
   const genreBreakdown = Array.from(genreMap.entries()).map(([genre, count]) => ({ genre, count })).sort((a, b) => b.count - a.count);
   const authorMap = /* @__PURE__ */ new Map();
-  allBooks.forEach((b) => {
-    authorMap.set(b.author, (authorMap.get(b.author) ?? 0) + 1);
-  });
+  allBooks.forEach((b) => authorMap.set(b.author, (authorMap.get(b.author) ?? 0) + 1));
   const topAuthors = Array.from(authorMap.entries()).map(([author, count]) => ({ author, count })).sort((a, b) => b.count - a.count).slice(0, 5);
   const now = /* @__PURE__ */ new Date();
   const monthLabels = [];
@@ -57335,14 +57349,9 @@ router3.get("/stats", async (_req, res) => {
   allBooks.forEach((b) => {
     const d = new Date(b.createdAt);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    if (monthMap.has(key)) {
-      monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
-    }
+    if (monthMap.has(key)) monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
   });
-  const booksPerMonth = monthLabels.map(({ key, label }) => ({
-    month: label,
-    count: monthMap.get(key) ?? 0
-  }));
+  const booksPerMonth = monthLabels.map(({ key, label }) => ({ month: label, count: monthMap.get(key) ?? 0 }));
   const ratingMap = /* @__PURE__ */ new Map([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0]]);
   allBooks.forEach((b) => {
     if (b.rating != null && b.rating >= 1 && b.rating <= 5) {
@@ -57351,9 +57360,7 @@ router3.get("/stats", async (_req, res) => {
   });
   const ratingDistribution = Array.from(ratingMap.entries()).map(([rating, count]) => ({ rating, count })).sort((a, b) => a.rating - b.rating);
   const langMap = /* @__PURE__ */ new Map();
-  allBooks.forEach((b) => {
-    langMap.set(b.language, (langMap.get(b.language) ?? 0) + 1);
-  });
+  allBooks.forEach((b) => langMap.set(b.language, (langMap.get(b.language) ?? 0) + 1));
   const languageBreakdown = Array.from(langMap.entries()).map(([language, count]) => ({ language, count }));
   const fmtMap = /* @__PURE__ */ new Map([["physical", 0], ["pdf", 0], ["unspecified", 0]]);
   allBooks.forEach((b) => {
