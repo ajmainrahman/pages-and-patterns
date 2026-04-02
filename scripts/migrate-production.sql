@@ -16,6 +16,16 @@ CREATE TABLE IF NOT EXISTS journal_entries (
   domain      text,
   tags        text[] NOT NULL DEFAULT '{}',
   book_id     integer,
+  quote       text,
+  minutes_read integer,
+  pinned      boolean NOT NULL DEFAULT false,
+  is_reread   boolean NOT NULL DEFAULT false,
   created_at  timestamptz NOT NULL DEFAULT now(),
   updated_at  timestamptz NOT NULL DEFAULT now()
 );
+
+-- 3. Add new columns to journal_entries if the table already existed
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS quote text;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS minutes_read integer;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS pinned boolean NOT NULL DEFAULT false;
+ALTER TABLE journal_entries ADD COLUMN IF NOT EXISTS is_reread boolean NOT NULL DEFAULT false;

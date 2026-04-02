@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -12,6 +12,10 @@ export const journalEntriesTable = pgTable("journal_entries", {
   domain: text("domain"),
   tags: text("tags").array().notNull().default([]),
   bookId: integer("book_id"),
+  quote: text("quote"),
+  minutesRead: integer("minutes_read"),
+  pinned: boolean("pinned").notNull().default(false),
+  isReread: boolean("is_reread").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

@@ -299,6 +299,10 @@ export const ListJournalEntriesResponseItem = zod.object({
   domain: zod.string().nullish(),
   tags: zod.array(zod.string()),
   bookId: zod.number().nullish(),
+  quote: zod.string().nullish(),
+  minutesRead: zod.number().nullish(),
+  pinned: zod.boolean(),
+  isReread: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
 });
@@ -320,6 +324,10 @@ export const CreateJournalEntryBody = zod.object({
   domain: zod.string().nullish(),
   tags: zod.array(zod.string()).optional(),
   bookId: zod.number().nullish(),
+  quote: zod.string().nullish(),
+  minutesRead: zod.number().nullish(),
+  pinned: zod.boolean().optional(),
+  isReread: zod.boolean().optional(),
 });
 
 /**
@@ -337,6 +345,10 @@ export const GetJournalEntryResponse = zod.object({
   domain: zod.string().nullish(),
   tags: zod.array(zod.string()),
   bookId: zod.number().nullish(),
+  quote: zod.string().nullish(),
+  minutesRead: zod.number().nullish(),
+  pinned: zod.boolean(),
+  isReread: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
 });
@@ -357,6 +369,10 @@ export const UpdateJournalEntryBody = zod.object({
   domain: zod.string().nullish(),
   tags: zod.array(zod.string()).optional(),
   bookId: zod.number().nullish(),
+  quote: zod.string().nullish(),
+  minutesRead: zod.number().nullish(),
+  pinned: zod.boolean().optional(),
+  isReread: zod.boolean().optional(),
 });
 
 export const UpdateJournalEntryResponse = zod.object({
@@ -367,6 +383,10 @@ export const UpdateJournalEntryResponse = zod.object({
   domain: zod.string().nullish(),
   tags: zod.array(zod.string()),
   bookId: zod.number().nullish(),
+  quote: zod.string().nullish(),
+  minutesRead: zod.number().nullish(),
+  pinned: zod.boolean(),
+  isReread: zod.boolean(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
 });

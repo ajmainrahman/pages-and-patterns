@@ -717,6 +717,14 @@ components:
             type: string
         bookId:
           type: ["integer", "null"]
+        quote:
+          type: ["string", "null"]
+        minutesRead:
+          type: ["integer", "null"]
+        pinned:
+          type: boolean
+        isReread:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -729,6 +737,8 @@ components:
         - content
         - mood
         - tags
+        - pinned
+        - isReread
         - createdAt
         - updatedAt
 
@@ -751,6 +761,14 @@ components:
             type: string
         bookId:
           type: ["integer", "null"]
+        quote:
+          type: ["string", "null"]
+        minutesRead:
+          type: ["integer", "null"]
+        pinned:
+          type: boolean
+        isReread:
+          type: boolean
       required:
         - title
 
@@ -772,3 +790,11 @@ components:
             type: string
         bookId:
           type: ["integer", "null"]
+        quote:
+          type: ["string", "null"]
+        minutesRead:
+          type: ["integer", "null"]
+        pinned:
+          type: boolean
+        isReread:
+          type: boolean

@@ -41,6 +41,10 @@ router.post("/journal", async (req, res): Promise<void> => {
       domain: parsed.data.domain ?? null,
       tags: parsed.data.tags ?? [],
       bookId: parsed.data.bookId ?? null,
+      quote: parsed.data.quote ?? null,
+      minutesRead: parsed.data.minutesRead ?? null,
+      pinned: parsed.data.pinned ?? false,
+      isReread: parsed.data.isReread ?? false,
     })
     .returning();
   res.status(201).json(GetJournalEntryResponse.parse(entry));

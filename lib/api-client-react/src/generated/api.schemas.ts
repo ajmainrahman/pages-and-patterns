@@ -301,6 +301,12 @@ export interface JournalEntry {
   tags: string[];
   /** @nullable */
   bookId?: number | null;
+  /** @nullable */
+  quote?: string | null;
+  /** @nullable */
+  minutesRead?: number | null;
+  pinned: boolean;
+  isReread: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -325,6 +331,12 @@ export interface CreateJournalEntryBody {
   tags?: string[];
   /** @nullable */
   bookId?: number | null;
+  /** @nullable */
+  quote?: string | null;
+  /** @nullable */
+  minutesRead?: number | null;
+  pinned?: boolean;
+  isReread?: boolean;
 }
 
 export type UpdateJournalEntryBodyMood =
@@ -347,6 +359,12 @@ export interface UpdateJournalEntryBody {
   tags?: string[];
   /** @nullable */
   bookId?: number | null;
+  /** @nullable */
+  quote?: string | null;
+  /** @nullable */
+  minutesRead?: number | null;
+  pinned?: boolean;
+  isReread?: boolean;
 }
 
 export type ListBooksParams = {

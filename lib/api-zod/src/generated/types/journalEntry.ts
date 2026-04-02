@@ -17,6 +17,12 @@ export interface JournalEntry {
   tags: string[];
   /** @nullable */
   bookId?: number | null;
+  /** @nullable */
+  quote?: string | null;
+  /** @nullable */
+  minutesRead?: number | null;
+  pinned: boolean;
+  isReread: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
