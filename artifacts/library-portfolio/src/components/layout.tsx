@@ -1,8 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Home, Library as LibraryIcon, BarChart2, Plus, BookHeart } from "lucide-react";
+import { Home, Library as LibraryIcon, BarChart2, Plus, BookHeart, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -64,7 +66,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="mt-auto pt-8">
+        <div className="mt-auto pt-8 space-y-3">
           <Link
             href="/add"
             className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3.5 rounded-xl font-medium transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
@@ -72,6 +74,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Plus className="w-5 h-5" />
             Add Book
           </Link>
+          {user && (
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary/50">
+              <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <span className="text-xs font-bold text-primary">
+                  {(user.name || user.email).charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate text-foreground">{user.name || user.email}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{user.name ? user.email : ""}</p>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign out"
+                className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 

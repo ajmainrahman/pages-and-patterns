@@ -49,10 +49,34 @@ artifacts-monorepo/
 - `artifacts/library-portfolio/src/components/book-card.tsx` — Book card using `Book` type from api-client-react
 - `lib/api-client-react/src/generated/api.ts` — Auto-generated hooks: `useListBooks`, `useGetBook`, `useCreateBook`, `useUpdateBook`, `useDeleteBook`, `useGetStats`, `useListBengaliBooks`, `useListFavoriteBooks`, `useListRecentBooks`, `useListGenres`
 
+## Authentication
+
+JWT-based authentication using httpOnly cookies. Personal-use only (one account max).
+
+### Endpoints
+- `POST /api/auth/register` — Create account (only works when no users exist)
+- `POST /api/auth/login` — Login, sets httpOnly JWT cookie (7-day expiry)
+- `POST /api/auth/logout` — Clears cookie
+- `GET /api/auth/me` — Returns current user info
+
+### Frontend
+- `src/hooks/use-auth.tsx` — `AuthProvider` + `useAuth()` hook with `user`, `login`, `logout`, `refetch`
+- `src/pages/login.tsx` — Login page at `/login`
+- `src/pages/register.tsx` — One-time setup page at `/register`
+- All app routes are protected via `ProtectedRoute` in `App.tsx` — unauthenticated users redirected to `/login`
+- Sidebar shows user avatar, name/email, and logout button
+
+### DB
+- `lib/db/src/schema/users.ts` — `users` table (id, email, name, password_hash, created_at, updated_at)
+- `SESSION_SECRET` env var required in Vercel (any long random string)
+- bcryptjs (cost 12) for password hashing, jsonwebtoken for JWT signing
+
 ## Pages
 
 | Page | Route | Description |
 |------|-------|-------------|
+| Login | `/login` | Sign in page (redirected to when unauthenticated) |
+| Register | `/register` | One-time account setup |
 | Dashboard | `/` | Stats, currently reading, favorites, recent books |
 | Library | `/library` | Browse + filter all books |
 | Bengali Books | `/bangla` | বাংলা বই section |
