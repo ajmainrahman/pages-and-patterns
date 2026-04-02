@@ -1,8 +1,13 @@
 {
   "version": 2,
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @workspace/library-portfolio run build && pnpm --filter @workspace/api-server run build:vercel",
+  "buildCommand": "pnpm --filter @workspace/library-portfolio run build",
   "outputDirectory": "public",
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs22.x"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
