@@ -13,7 +13,7 @@ await esbuild({
   entryPoints: [path.resolve(artifactDir, "src/app.ts")],
   platform: "node",
   bundle: true,
-  format: "cjs",
+  format: "esm",
   outfile: outFile,
   logLevel: "info",
   external: [
@@ -21,12 +21,12 @@ await esbuild({
     "fsevents", "pg-native", "oracledb", "mysql2", "sequelize",
   ],
   banner: {
-    js: `import { createRequire as __cr } from 'node:module';
-import __path from 'node:path';
-import __url from 'node:url';
-globalThis.require = __cr(import.meta.url);
-globalThis.__filename = __url.fileURLToPath(import.meta.url);
-globalThis.__dirname = __path.dirname(globalThis.__filename);`,
+    js: `import { createRequire as __bannerCrReq } from 'node:module';
+import __bannerPath from 'node:path';
+import __bannerUrl from 'node:url';
+globalThis.require = __bannerCrReq(import.meta.url);
+globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
+globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);`,
   },
 });
 
